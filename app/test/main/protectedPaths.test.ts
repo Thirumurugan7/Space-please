@@ -24,6 +24,11 @@ describe('protectionReason', () => {
     expect(protectionReason('/Users/me/Projects', { ...ctx, scanRoot: '/Users/me/Projects' })).toContain('scanned folder')
   })
 
+  it('rejects the scan root even when it carries a trailing slash', () => {
+    expect(protectionReason('/Users/me/Projects', { ...ctx, scanRoot: '/Users/me/Projects/' })).toContain('scanned folder')
+    expect(protectionReason('/Users/me/Projects/', { ...ctx, scanRoot: '/Users/me/Projects' })).toContain('scanned folder')
+  })
+
   it.each(['/Users/me/Downloads/big.dmg', '/Users/me/Library/Caches/com.app', '/Applications/Other.app', '/usrlocal', '/Systemic'])(
     'allows %s',
     (path) => {

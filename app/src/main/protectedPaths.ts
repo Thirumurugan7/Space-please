@@ -17,7 +17,8 @@ export function protectionReason(path: string, ctx: GuardContext): string | null
   for (const prefix of PROTECTED_PREFIXES) {
     if (within(p, prefix)) return `${prefix} is a protected system location`
   }
-  if (ctx.scanRoot !== null && p === ctx.scanRoot) return 'The scanned folder itself cannot be trashed'
+  const scanRoot = ctx.scanRoot !== null && ctx.scanRoot.length > 1 ? ctx.scanRoot.replace(/\/+$/, '') : ctx.scanRoot
+  if (scanRoot !== null && p === scanRoot) return 'The scanned folder itself cannot be trashed'
   if (within(ctx.home, p)) return 'Your home folder cannot be trashed'
   if (within(p, ctx.appPath) || within(ctx.appPath, p)) return 'Space Analyser cannot trash itself'
   return null

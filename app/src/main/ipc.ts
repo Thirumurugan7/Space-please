@@ -13,9 +13,11 @@ export interface IpcDeps {
   appPath: string
   window(): BrowserWindow | null
   env: Record<string, string | undefined>
+  /** Test hooks (like SA_E2E_CHOOSE_FOLDER) are only ever honoured when this is false. */
+  isPackaged: boolean
 }
 
-export function registerIpc({ engine, home, appPath, window, env }: IpcDeps): void {
+export function registerIpc({ engine, home, appPath, window, env, isPackaged }: IpcDeps): void {
   const handle = (channel: string, fn: (...args: any[]) => unknown) => {
     ipcMain.handle(channel, (_event, ...args) => fn(...args))
   }
@@ -40,7 +42,10 @@ export function registerIpc({ engine, home, appPath, window, env }: IpcDeps): vo
   handle(C.actionsTrash, async (ids: number[]): Promise<TrashResult> => {
     const items = await engine.call('paths', ids)
     const state = await engine.call('getState')
-    const ctx: GuardContext = { appPath, scanRoot: state.root, home }
+    // Use the tree's own root path (id 0), not the renderer-supplied scan root: that value may
+    // carry a trailing slash or otherwise not match what the tree normalised internally.
+    const scanRoot = (await engine.call('paths', [0]))[0]?.path ?? state.root
+    const ctx: GuardContext = { appPath, scanRoot, home }
     const result = await trashPaths(items, ctx, {
       trashItem: (path) => shell.trashItem(path),
       exists: (path) => access(path).then(() => true, () => false),
@@ -68,7 +73,7 @@ export function registerIpc({ engine, home, appPath, window, env }: IpcDeps): vo
   handle(C.systemHome, () => home)
 
   handle(C.dialogChooseFolder, async () => {
-    if (env.SA_E2E_CHOOSE_FOLDER) return env.SA_E2E_CHOOSE_FOLDER
+    if (!isPackaged && env.SA_E2E_CHOOSE_FOLDER) return env.SA_E2E_CHOOSE_FOLDER
     const win = window()
     const options = { title: 'Choose a folder to scan', properties: ['openDirectory' as const] }
     const res = win ? await dialog.showOpenDialog(win, options) : await dialog.showOpenDialog(options)

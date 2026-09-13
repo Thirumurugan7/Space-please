@@ -13,7 +13,8 @@ export interface TrashDeps {
 export async function trashPaths(items: { id: number; path: string }[], ctx: GuardContext, deps: TrashDeps): Promise<TrashResult> {
   const result: TrashResult = { trashed: [], missing: [], failed: [], rejected: [] }
   for (const item of items) {
-    const reason = protectionReason(item.path, ctx)
+    // id 0 is always the scan root itself, regardless of what path the renderer sent for it.
+    const reason = item.id === 0 ? 'The scanned folder itself cannot be trashed' : protectionReason(item.path, ctx)
     if (reason) result.rejected.push({ path: item.path, reason })
   }
   if (result.rejected.length > 0) return result

@@ -36,6 +36,14 @@ describe('trashPaths', () => {
     })
   })
 
+  it('rejects id 0 (the scan root entry) outright, even if its path looks ordinary', async () => {
+    const { deps, trashed } = fakeDeps(['/Users/me/Projects'])
+    const res = await trashPaths([{ id: 0, path: '/Users/me/Projects' }], ctx, deps)
+    expect(trashed).toEqual([])
+    expect(res.trashed).toEqual([])
+    expect(res.rejected).toEqual([{ path: '/Users/me/Projects', reason: 'The scanned folder itself cannot be trashed' }])
+  })
+
   it('trashes nothing when any path is protected', async () => {
     const { deps, trashed } = fakeDeps(['/Users/me/a', '/System/Library'])
     const res = await trashPaths(
