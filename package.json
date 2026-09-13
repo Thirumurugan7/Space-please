@@ -1,0 +1,12 @@
+{
+  "name": "space-analyser-root",
+  "private": true,
+  "scripts": {
+    "scanner:build": "swift build -c release --package-path scanner",
+    "scanner:test": "swift test --package-path scanner",
+    "dev": "npm run scanner:build && npm --prefix app run dev",
+    "test": "npm run scanner:test && npm run scanner:build && npm --prefix app test",
+    "e2e": "npm run scanner:build && npm --prefix app run e2e",
+    "build": "npm run scanner:build && npm --prefix app run dist"
+  }
+}
