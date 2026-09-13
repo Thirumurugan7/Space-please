@@ -41,6 +41,8 @@ export class Engine {
   private duplicateAbort: AbortController | null = null
   private saveTimer: NodeJS.Timeout | null = null
   private saving: Promise<void> = Promise.resolve()
+  /** Set by init(); startScan() awaits it so a slow snapshot load cannot clobber a started scan. */
+  private initializing: Promise<ScanState> | null = null
 
   constructor(opts: EngineOptions, emit: (event: EngineEvent) => void) {
     this.opts = opts
@@ -48,7 +50,13 @@ export class Engine {
     this.scanner = new ScanController(opts.scannerPath)
   }
 
-  async init(): Promise<ScanState> {
+  init(): Promise<ScanState> {
+    const promise = this.doInit()
+    this.initializing = promise
+    return promise
+  }
+
+  private async doInit(): Promise<ScanState> {
     const snapshot = await loadSnapshot(this.opts.snapshotPath)
     if (snapshot) {
       this.setTree(snapshot.tree)
@@ -72,6 +80,9 @@ export class Engine {
   }
 
   async startScan(root: string): Promise<ScanState> {
+    // A slow snapshot load from init() must not resolve after (and overwrite) a scan that has
+    // already started. If startScan() is called without init() ever running, this is a no-op.
+    if (this.initializing) await this.initializing.catch(() => {})
     if (this.scanner.running) throw new Error('A scan is already running')
     this.cancelDuplicates()
     this.setTree(null)

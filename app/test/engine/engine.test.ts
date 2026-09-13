@@ -90,6 +90,34 @@ describe('Engine', () => {
     expect(large.items.map((r) => r.name)).toEqual(['movie.mov'])
   })
 
+  it('does not let a slow init() snapshot load overwrite a scan that started before it resolved', async () => {
+    // Produce a real snapshot on disk so a fresh engine's init() has genuine async work to do.
+    const seed = makeEngine()
+    await seed.init()
+    await seed.startScan(root)
+    await seed.flush()
+
+    const root2 = join(dir, 'root2')
+    mkdirSync(root2, { recursive: true })
+    writeFileSync(join(root2, 'other.txt'), 'x')
+
+    const engine = makeEngine()
+    const initPromise = engine.init() // intentionally not awaited, as some callers (and old bugs) do
+    const state = await engine.startScan(root2)
+    await initPromise
+
+    expect(state.root).toBe(root2)
+    expect(engine.getState().root).toBe(root2)
+    expect(engine.children(0, sort, 0, 10).rows.map((r) => r.name)).toEqual(['other.txt'])
+  })
+
+  it('still works when startScan is called without init ever running', async () => {
+    const engine = makeEngine()
+    const state = await engine.startScan(root)
+    expect(state.status).toBe('ready')
+    expect(state.root).toBe(root)
+  })
+
   it('enters the error state when the root cannot be scanned', async () => {
     const engine = makeEngine()
     await engine.init()
