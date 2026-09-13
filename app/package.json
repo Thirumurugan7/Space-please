@@ -57,7 +57,14 @@
     "mac": {
       "target": "dir",
       "category": "public.app-category.utilities",
-      "identity": null
+      "identity": null,
+      "extendInfo": {
+        "NSDesktopFolderUsageDescription": "Space Analyser reads file sizes on your Desktop to show what uses storage.",
+        "NSDocumentsFolderUsageDescription": "Space Analyser reads file sizes in your Documents folder to show what uses storage.",
+        "NSDownloadsFolderUsageDescription": "Space Analyser reads file sizes in your Downloads folder to show what uses storage.",
+        "NSRemovableVolumesUsageDescription": "Space Analyser reads file sizes on removable volumes to show what uses storage.",
+        "NSNetworkVolumesUsageDescription": "Space Analyser reads file sizes on network volumes to show what uses storage."
+      }
     }
   }
 }
