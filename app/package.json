@@ -34,5 +34,30 @@
     "typescript": "5.9.3",
     "vite": "7.3.6",
     "vitest": "5.0.0"
+  },
+  "build": {
+    "appId": "com.gryphin.space-analyser",
+    "productName": "Space Analyser",
+    "directories": {
+      "output": "dist"
+    },
+    "files": [
+      "out/**/*",
+      "package.json"
+    ],
+    "asarUnpack": [
+      "out/main/**"
+    ],
+    "extraResources": [
+      {
+        "from": "../scanner/.build/release/sa-scan",
+        "to": "bin/sa-scan"
+      }
+    ],
+    "mac": {
+      "target": "dir",
+      "category": "public.app-category.utilities",
+      "identity": null
+    }
   }
 }
