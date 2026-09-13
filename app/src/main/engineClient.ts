@@ -8,6 +8,8 @@ export class EngineClient {
   private readonly worker: Worker
   private nextId = 1
   private readonly pending = new Map<number, { resolve(value: unknown): void; reject(err: Error): void }>()
+  /** Set once the worker has exited or errored; no further call() can ever resolve. */
+  private dead = false
 
   constructor(workerPath: string, options: EngineOptions, onEvent: (event: EngineEvent) => void) {
     this.worker = new Worker(workerPath, { workerData: options })
@@ -22,11 +24,18 @@ export class EngineClient {
       if (message.error !== undefined) call.reject(new Error(message.error))
       else call.resolve(message.result)
     })
-    this.worker.on('error', (err) => this.failAll(err))
-    this.worker.on('exit', (code) => this.failAll(new Error(`Engine worker exited with code ${code}`)))
+    this.worker.on('error', (err) => {
+      this.dead = true
+      this.failAll(err)
+    })
+    this.worker.on('exit', (code) => {
+      this.dead = true
+      this.failAll(new Error(`Engine worker exited with code ${code}`))
+    })
   }
 
   call<M extends EngineMethod>(method: M, ...args: EngineArgs<M>): Promise<EngineResult<M>> {
+    if (this.dead) return Promise.reject(new Error('Engine worker is not running'))
     const id = this.nextId++
     return new Promise((resolve, reject) => {
       this.pending.set(id, { resolve: resolve as (value: unknown) => void, reject })

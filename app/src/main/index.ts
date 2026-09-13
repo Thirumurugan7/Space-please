@@ -28,6 +28,10 @@ function createWindow(): BrowserWindow {
     },
   })
   window.once('ready-to-show', () => window.show())
+  // Prevent dragging a file/link onto the window (or a renderer-triggered navigation) from
+  // loading arbitrary content into a webContents that has window.sa access.
+  window.webContents.on('will-navigate', (event) => event.preventDefault())
+  window.webContents.setWindowOpenHandler(() => ({ action: 'deny' }))
   if (process.env.ELECTRON_RENDERER_URL) void window.loadURL(process.env.ELECTRON_RENDERER_URL)
   else void window.loadFile(join(__dirname, '../renderer/index.html'))
   window.on('closed', () => {
@@ -53,7 +57,14 @@ void app.whenReady().then(() => {
     (event) => win?.webContents.send(CHANNELS.engineEvent, event),
   )
 
-  registerIpc({ engine, home, appPath: bundlePath(app.getPath('exe')), window: () => win, env: process.env })
+  registerIpc({
+    engine,
+    home,
+    appPath: bundlePath(app.getPath('exe')),
+    window: () => win,
+    env: process.env,
+    isPackaged: app.isPackaged,
+  })
   win = createWindow()
   void engine.call('init')
 
@@ -61,14 +72,13 @@ void app.whenReady().then(() => {
   app.on('before-quit', (event) => {
     if (flushed) return
     event.preventDefault()
-    void engine
-      .call('flush')
-      .catch(() => {})
-      .finally(() => {
-        flushed = true
-        void engine.terminate()
-        app.quit()
-      })
+    // The worker may have died or hung: never let a stuck/rejected flush() block quitting.
+    const timeout = new Promise<void>((resolve) => setTimeout(resolve, 3000))
+    void Promise.race([engine.call('flush').catch(() => {}), timeout]).finally(() => {
+      flushed = true
+      void engine.terminate()
+      app.quit()
+    })
   })
 })
 
