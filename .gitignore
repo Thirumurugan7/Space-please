@@ -1,0 +1,8 @@
+.DS_Store
+scanner/.build/
+node_modules/
+app/out/
+app/dist/
+app/test-results/
+app/playwright-report/
+.superpowers/
