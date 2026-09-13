@@ -126,16 +126,19 @@ public final class Scanner: @unchecked Sendable {
         stack = [Job(id: 0, path: root)]
 
         let progressDone = DispatchSemaphore(value: 0)
+        let progressFinished = DispatchSemaphore(value: 0)
         let progressThread = Thread { [self] in
             while progressDone.wait(timeout: .now() + .milliseconds(options.progressIntervalMs)) == .timedOut {
                 emitProgress()
             }
+            progressFinished.signal()
         }
         progressThread.start()
 
         DispatchQueue.concurrentPerform(iterations: options.threads) { _ in worker() }
 
         progressDone.signal()
+        progressFinished.wait()
         emitProgress()
 
         let result = ScanResult(entries: entryCount.load(ordering: .relaxed),
@@ -251,6 +254,7 @@ public final class Scanner: @unchecked Sendable {
                 switch parsed.objType {
                 case fsobj_type_t(VDIR.rawValue):
                     if parsed.mountStatus & UInt32(DIR_MNTSTATUS_MNTPOINT) != 0 { continue }
+                    // De-duplicate directories by file id so firmlinked paths are not descended twice (st_dev is identical across / and /System/Volumes/Data).
                     let firstVisit = seen.withLock { $0.dirs.insert(parsed.fileId).inserted }
                     if !firstVisit { continue }
                     kind = .dir
