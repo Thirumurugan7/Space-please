@@ -51,8 +51,11 @@ describe('resolveScannerPath', () => {
     expect(resolveScannerPath({ ...base, isPackaged: false })).toBe('/repo/scanner/.build/release/sa-scan')
   })
 
-  it('honours SA_SCANNER_PATH', () => {
-    expect(resolveScannerPath({ ...base, isPackaged: true, env: { SA_SCANNER_PATH: '/tmp/sa' } })).toBe('/tmp/sa')
+  it('honours SA_SCANNER_PATH only in development, never in a packaged build', () => {
+    expect(resolveScannerPath({ ...base, isPackaged: false, env: { SA_SCANNER_PATH: '/tmp/sa' } })).toBe('/tmp/sa')
+    expect(resolveScannerPath({ ...base, isPackaged: true, env: { SA_SCANNER_PATH: '/tmp/sa' } })).toBe(
+      '/App.app/Contents/Resources/bin/sa-scan',
+    )
   })
 })
 

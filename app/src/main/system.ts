@@ -34,7 +34,8 @@ export interface ScannerLocation {
 }
 
 export function resolveScannerPath(loc: ScannerLocation): string {
-  if (loc.env.SA_SCANNER_PATH) return loc.env.SA_SCANNER_PATH
+  // A test hook: never honoured in a packaged build, where it could point at an arbitrary binary.
+  if (!loc.isPackaged && loc.env.SA_SCANNER_PATH) return loc.env.SA_SCANNER_PATH
   return loc.isPackaged
     ? join(loc.resourcesPath, 'bin', 'sa-scan')
     : join(loc.appPath, '..', 'scanner', '.build', 'release', 'sa-scan')
