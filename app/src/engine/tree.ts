@@ -143,6 +143,8 @@ export class Tree {
   readonly rootPath: string
 
   private readonly decoder = new TextDecoder()
+  /** id 0 and every id whose full ancestor chain has an ENTRY frame, in id order. */
+  private readonly linked: Uint8Array
 
   constructor(c: TreeColumns) {
     if (c.count === 0 || c.parent[0] !== ROOT_PARENT) throw new Error('tree has no root entry')
@@ -163,6 +165,7 @@ export class Tree {
       const p = c.parent[id]
       linked[id] = p < id && linked[p] === 1 && (c.flags[id] & FLAG_DELETED) === 0 ? 1 : 0
     }
+    this.linked = linked
 
     this.total = new Float64Array(count)
     this.items = new Uint32Array(count)
@@ -227,7 +230,7 @@ export class Tree {
   }
 
   isPresent(id: number): boolean {
-    return id >= 0 && id < this.count && this.parent[id] !== ABSENT && (this.flags[id] & FLAG_DELETED) === 0
+    return id >= 0 && id < this.count && this.linked[id] === 1 && (this.flags[id] & FLAG_DELETED) === 0
   }
 
   name(id: number): string {
@@ -246,9 +249,14 @@ export class Tree {
     if (id === 0) return this.rootPath
     const parts: string[] = []
     let cur = id
-    while (cur !== 0 && cur < this.count) {
+    while (cur !== 0 && cur !== ABSENT && cur !== ROOT_PARENT && cur < this.count) {
+      const p = this.parent[cur]
+      // cur itself never received an ENTRY frame (it only exists as someone's parent id):
+      // stop before contributing its empty name, which would otherwise produce a wrong path.
+      if (p === ABSENT) break
       parts.push(this.name(cur))
-      cur = this.parent[cur]
+      if (p === ROOT_PARENT || p >= this.count) break
+      cur = p
     }
     const base = this.rootPath === '/' ? '' : this.rootPath
     return `${base}/${parts.reverse().join('/')}`
@@ -306,7 +314,7 @@ export class Tree {
       for (const child of this.children(n)) stack.push(child)
     }
     let p = this.parent[id]
-    while (p !== ROOT_PARENT) {
+    while (p !== ROOT_PARENT && p !== ABSENT && p < this.count) {
       this.total[p] -= size
       this.items[p] -= items
       p = this.parent[p]

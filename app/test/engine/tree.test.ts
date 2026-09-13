@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { FLAG_DELETED, Tree, TreeBuilder } from '../../src/engine/tree'
+import { emptyQuery, searchIds } from '../../src/engine/query'
 import { Kind, ROOT_PARENT } from '../../src/shared/protocol'
 import { treeFromPaths } from '../helpers/treeFixture'
 
@@ -123,5 +124,25 @@ describe('TreeBuilder + Tree', () => {
     const b = new TreeBuilder(4)
     b.add(1, 0, Kind.File, 0, 1, 0, enc('orphan'))
     expect(() => b.build()).toThrow('tree has no root entry')
+  })
+
+  it('treats a child whose parent never received an ENTRY frame as absent, not a wrong-path leak', () => {
+    const b = new TreeBuilder(4)
+    b.add(0, ROOT_PARENT, Kind.Dir, 0, 0, 0, enc('/r'))
+    // id 1 (the parent) never arrives; id 2 arrives referencing it as parent.
+    b.add(2, 1, Kind.File, 0, 42, 0, enc('x.bin'))
+    const t = b.build()
+
+    expect(t.isPresent(2)).toBe(false)
+    expect(t.isPresent(1)).toBe(false)
+
+    const found = searchIds(t, { ...emptyQuery(), text: 'x.bin' })
+    expect(Array.from(found)).toEqual([])
+
+    expect(t.remove(2)).toBeNull()
+
+    // path() must not loop forever walking through the missing parent, nor fabricate a
+    // different file's path via a double slash.
+    expect(t.path(2)).toBe('/r/x.bin')
   })
 })
