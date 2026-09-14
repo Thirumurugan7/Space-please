@@ -13,6 +13,7 @@
     <meta property="og:image" content="assets/screens/dark-overview.png" />
     <link rel="icon" type="image/png" href="assets/icon.png" />
     <link rel="stylesheet" href="styles.css" />
+    <script src="insights.js" defer></script>
   </head>
   <body>
     <div class="glow glow-a" aria-hidden="true"></div>
@@ -56,7 +57,7 @@
       <section class="numbers" aria-label="At a glance">
         <div><strong>5.8M</strong><span>files scanned in about 28 seconds</span></div>
         <div><strong>0</strong><span>files ever deleted permanently</span></div>
-        <div><strong>0</strong><span>network requests, analytics or accounts</span></div>
+        <div><strong>0</strong><span>file names or paths ever leave your Mac</span></div>
         <div><strong>MIT</strong><span>licensed and open source</span></div>
       </section>
 
@@ -135,8 +136,8 @@
             <p>You always see the item count and total size first, with a second check for big removals.</p>
           </div>
           <div>
-            <h3>Stays on your Mac</h3>
-            <p>No uploads, analytics or accounts. Scan results are stored locally and nowhere else.</p>
+            <h3>Your files stay on your Mac</h3>
+            <p>No accounts, and your files, their names and paths are never uploaded. The app sends anonymous usage stats to help improve it, which you can turn off in Settings.</p>
           </div>
         </div>
       </section>
@@ -225,6 +226,14 @@ npm run dev</code></pre>
           </p>
         </details>
         <details>
+          <summary>What data does Space-please collect?</summary>
+          <p>
+            Only anonymous usage stats, to help improve the app: which features are used, how many files a scan found,
+            how much was moved to the Trash, and your app version and macOS version. It never includes your file names,
+            paths or search text, and there's no account. Turn it off any time under Privacy in the app's sidebar.
+          </p>
+        </details>
+        <details>
           <summary>Does it work on Windows or Linux?</summary>
           <p>Not yet. The scanner relies on macOS. Contributions for other platforms are welcome on GitHub.</p>
         </details>
@@ -236,7 +245,7 @@ npm run dev</code></pre>
         <img src="assets/icon.png" alt="" width="24" height="24" />
         <span>Space-please</span>
       </div>
-      <p>Open source under the MIT licence.</p>
+      <p>Open source under the MIT licence. This site counts visits anonymously.</p>
       <nav aria-label="Footer">
         <a href="https://github.com/Thirumurugan7/Space-please">GitHub</a>
         <a href="https://github.com/Thirumurugan7/Space-please/releases">Releases</a>

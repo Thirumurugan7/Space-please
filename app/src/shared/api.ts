@@ -53,6 +53,13 @@ export interface SaApi {
   dialog: {
     chooseFolder(): Promise<string | null>
   }
+  telemetry: {
+    /** Fire-and-forget: report an anonymous usage event. No-op when the user has opted out. */
+    track(name: string, props?: Record<string, string | number | boolean>): void
+    /** Whether anonymous usage stats are currently being sent, and whether they're on for this build. */
+    state(): Promise<{ enabled: boolean; active: boolean }>
+    setEnabled(enabled: boolean): Promise<{ enabled: boolean; active: boolean }>
+  }
   onEvent(listener: (event: EngineEvent) => void): () => void
 }
 
@@ -78,5 +85,8 @@ export const CHANNELS = {
   systemOpenFdaSettings: 'system:openFdaSettings',
   systemHome: 'system:home',
   dialogChooseFolder: 'dialog:chooseFolder',
+  telemetryTrack: 'telemetry:track',
+  telemetryState: 'telemetry:state',
+  telemetrySetEnabled: 'telemetry:setEnabled',
   engineEvent: 'engine:event',
 } as const

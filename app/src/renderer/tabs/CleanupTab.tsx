@@ -5,6 +5,7 @@ import { CategoryTile } from '../components/Icon'
 import { ItemList } from '../components/ItemList'
 import { allButOne, pruneDuplicates } from '../lib/cleanup'
 import { formatBytes, plural } from '../lib/format'
+import { track } from '../lib/track'
 import { useChecked } from '../lib/useChecked'
 
 interface Props {
@@ -64,10 +65,17 @@ export function CleanupTab({ state, revision }: Props) {
     setFinding(true)
     setDupes(null)
     try {
-      setDupes(await window.sa.cleanup.findDuplicates())
+      const result = await window.sa.cleanup.findDuplicates()
+      setDupes(result)
+      track('duplicates_scan', { groups: result.groups.length, bytes: result.wasted })
     } finally {
       setFinding(false)
     }
+  }
+
+  const toggleCategory = (id: CleanupCategoryId) => {
+    if (expanded !== id) track('cleanup_expand', { category: id })
+    setExpanded(expanded === id ? null : id)
   }
 
   return (
@@ -96,7 +104,7 @@ export function CleanupTab({ state, revision }: Props) {
               type="button"
               className="card-header"
               aria-expanded={expanded === cat.id}
-              onClick={() => setExpanded(expanded === cat.id ? null : cat.id)}
+              onClick={() => toggleCategory(cat.id)}
             >
               <div className="card-lead">
                 <CategoryTile id={cat.id} />

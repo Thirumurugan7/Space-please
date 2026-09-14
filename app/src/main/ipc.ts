@@ -5,6 +5,7 @@ import type { ReportOptions, SearchQuery, Sort, TrashResult } from '../shared/ty
 import type { EngineClient } from './engineClient'
 import type { GuardContext } from './protectedPaths'
 import { FDA_SETTINGS_URL, diskInfo, fdaStatus } from './system'
+import type { Telemetry } from './telemetry'
 import { trashPaths } from './trash'
 
 export interface IpcDeps {
@@ -15,15 +16,24 @@ export interface IpcDeps {
   env: Record<string, string | undefined>
   /** Test hooks (like SA_E2E_CHOOSE_FOLDER) are only ever honoured when this is false. */
   isPackaged: boolean
+  telemetry: Telemetry
 }
 
-export function registerIpc({ engine, home, appPath, window, env, isPackaged }: IpcDeps): void {
+/** Classify a scan root so we record whether people scan the disk, Home or an arbitrary folder. */
+function scanTarget(root: string, home: string): 'disk' | 'home' | 'folder' {
+  if (root === '/') return 'disk'
+  if (root === home) return 'home'
+  return 'folder'
+}
+
+export function registerIpc({ engine, home, appPath, window, env, isPackaged, telemetry }: IpcDeps): void {
   const handle = (channel: string, fn: (...args: any[]) => unknown) => {
     ipcMain.handle(channel, (_event, ...args) => fn(...args))
   }
   const onePath = async (id: number) => (await engine.call('paths', [id]))[0]?.path ?? null
 
   handle(C.scanStart, (root: string) => {
+    telemetry.track('scan_start', { target: scanTarget(root, home) })
     // Resolves when the scan finishes; the renderer follows progress through engine events.
     void engine.call('startScan', root).catch(() => {})
   })
@@ -79,5 +89,14 @@ export function registerIpc({ engine, home, appPath, window, env, isPackaged }: 
     const options = { title: 'Choose a folder to scan', properties: ['openDirectory' as const] }
     const res = win ? await dialog.showOpenDialog(win, options) : await dialog.showOpenDialog(options)
     return res.canceled ? null : (res.filePaths[0] ?? null)
+  })
+
+  handle(C.telemetryTrack, (name: string, props?: Record<string, unknown>) => {
+    telemetry.trackFromRenderer({ name, props })
+  })
+  handle(C.telemetryState, () => telemetry.getState())
+  handle(C.telemetrySetEnabled, (enabled: boolean) => {
+    telemetry.setEnabled(Boolean(enabled))
+    return telemetry.getState()
   })
 }

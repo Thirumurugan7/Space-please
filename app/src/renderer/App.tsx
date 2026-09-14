@@ -5,6 +5,7 @@ import { Sidebar } from './components/Sidebar'
 import { Tour } from './components/Tour'
 import { ActionsProvider } from './lib/actions'
 import { formatBytes, formatCount } from './lib/format'
+import { track } from './lib/track'
 import { markTourComplete, shouldShowTour, type KeyValueStore } from './lib/tour'
 import { CleanupTab } from './tabs/CleanupTab'
 import { OverviewTab } from './tabs/OverviewTab'
@@ -72,7 +73,10 @@ export function App() {
                   aria-selected={tab === t.id}
                   className={`tab${tab === t.id ? ' active' : ''}`}
                   disabled={!ready}
-                  onClick={() => setTab(t.id)}
+                  onClick={() => {
+                    setTab(t.id)
+                    track('tab_view', { tab: t.id })
+                  }}
                 >
                   <Icon name={t.icon} size={15} />
                   {t.label}

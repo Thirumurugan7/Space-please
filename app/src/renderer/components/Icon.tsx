@@ -21,6 +21,7 @@ export type IconName =
   | 'archive'
   | 'app'
   | 'link'
+  | 'shield'
 
 const PATHS: Record<IconName, string> = {
   drive: 'M3 14h18M5.5 5h13l2.5 9v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4zM17 17h.01',
@@ -43,6 +44,7 @@ const PATHS: Record<IconName, string> = {
   archive: 'M4 4h16v5H4zM5 9v11h14V9M10 13h4',
   app: 'M5 5h6v6H5zM13 5h6v6h-6zM5 13h6v6H5zM13 13h6v6h-6z',
   link: 'M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1',
+  shield: 'M12 3l7 3v5c0 4.4-3 7.6-7 9-4-1.4-7-4.6-7-9V6z',
 }
 
 export const TYPE_ICONS: Record<FileType | 'link', IconName> = {

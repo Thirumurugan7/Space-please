@@ -39,6 +39,14 @@ const api: SaApi = {
   dialog: {
     chooseFolder: () => invoke(C.dialogChooseFolder),
   },
+  telemetry: {
+    track: (name, props) => {
+      // Fire-and-forget: telemetry must never block or surface errors in the UI.
+      void invoke(C.telemetryTrack, name, props).catch(() => {})
+    },
+    state: () => invoke(C.telemetryState),
+    setEnabled: (enabled) => invoke(C.telemetrySetEnabled, enabled),
+  },
   onEvent: (listener) => {
     const handler = (_: unknown, event: EngineEvent) => listener(event)
     ipcRenderer.on(C.engineEvent, handler)

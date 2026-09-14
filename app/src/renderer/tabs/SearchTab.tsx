@@ -8,6 +8,7 @@ import { VirtualTable, type Column } from '../components/VirtualTable'
 import { useActions } from '../lib/actions'
 import { formatBytes, formatDate, nowSeconds, plural } from '../lib/format'
 import { emptySelection, withoutIds } from '../lib/selection'
+import { track } from '../lib/track'
 
 interface Props {
   state: ScanState
@@ -65,10 +66,21 @@ export function SearchTab({ state, revision }: Props) {
   const queryKey = JSON.stringify([state.root, state.scannedAt, query, sort])
   useEffect(() => setSelection(emptySelection()), [queryKey])
 
-  const fetchPage = useCallback((offset: number, limit: number) => window.sa.tree.search(query, sort, offset, limit), [query, sort])
+  const fetchPage = useCallback(
+    async (offset: number, limit: number) => {
+      const page = await window.sa.tree.search(query, sort, offset, limit)
+      // Report only the first page of a query, and never the text itself — just its length and hit count.
+      if (offset === 0 && debounced.trim().length > 0) track('search', { query_length: debounced.trim().length, results: page.total })
+      return page
+    },
+    [query, sort, debounced],
+  )
   const closeMenu = useCallback(() => setMenu(null), [])
   const removed = (ids: number[]) => setSelection((s) => withoutIds(s, ids))
-  const toggleType = (t: FileType) => setTypes((list) => (list.includes(t) ? list.filter((x) => x !== t) : [...list, t]))
+  const toggleType = (t: FileType) => {
+    track('filter_use', { kind: 'type', value: t })
+    setTypes((list) => (list.includes(t) ? list.filter((x) => x !== t) : [...list, t]))
+  }
 
   const columns: Column[] = [
     { id: 'name', label: 'Name', width: 'minmax(180px, 1fr)', sortKey: 'name', render: (r) => <NameCell row={r} /> },
@@ -117,21 +129,42 @@ export function SearchTab({ state, revision }: Props) {
           ))}
         </div>
         <div className="selects">
-          <select aria-label="Minimum size" value={minSize} onChange={(e) => setMinSize(e.target.value)}>
+          <select
+            aria-label="Minimum size"
+            value={minSize}
+            onChange={(e) => {
+              track('filter_use', { kind: 'size', value: e.target.value || 'any' })
+              setMinSize(e.target.value)
+            }}
+          >
             {SIZES.map((s) => (
               <option key={s.value} value={s.value}>
                 {s.label}
               </option>
             ))}
           </select>
-          <select aria-label="Modified" value={date} onChange={(e) => setDate(e.target.value as DateFilter)}>
+          <select
+            aria-label="Modified"
+            value={date}
+            onChange={(e) => {
+              track('filter_use', { kind: 'date', value: e.target.value })
+              setDate(e.target.value as DateFilter)
+            }}
+          >
             {DATES.map((d) => (
               <option key={d.value} value={d.value}>
                 {d.label}
               </option>
             ))}
           </select>
-          <select aria-label="Kind" value={kind} onChange={(e) => setKind(e.target.value as SearchQuery['kind'])}>
+          <select
+            aria-label="Kind"
+            value={kind}
+            onChange={(e) => {
+              track('filter_use', { kind: 'kind', value: e.target.value })
+              setKind(e.target.value as SearchQuery['kind'])
+            }}
+          >
             <option value="any">Files and folders</option>
             <option value="files">Files only</option>
             <option value="folders">Folders only</option>

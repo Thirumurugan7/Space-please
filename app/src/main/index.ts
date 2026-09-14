@@ -1,10 +1,12 @@
 import { join } from 'node:path'
-import { BrowserWindow, app } from 'electron'
+import { BrowserWindow, app, net } from 'electron'
 import { CHANNELS } from '../shared/api'
+import type { EngineEvent } from '../shared/types'
 import { EngineClient } from './engineClient'
 import { registerIpc } from './ipc'
 import { bundlePath } from './protectedPaths'
 import { resolveScannerPath, unpackedPath } from './system'
+import { Telemetry, telemetryActive } from './telemetry'
 
 if (process.env.SA_USER_DATA) app.setPath('userData', process.env.SA_USER_DATA)
 
@@ -46,6 +48,42 @@ function createWindow(): BrowserWindow {
 
 void app.whenReady().then(() => {
   const home = app.getPath('home')
+
+  const telemetry = new Telemetry({
+    userDataDir: app.getPath('userData'),
+    env: {
+      app_version: app.getVersion(),
+      os_version: process.getSystemVersion(),
+      arch: process.arch,
+      locale: app.getLocale(),
+    },
+    active: telemetryActive({ env: process.env, isPackaged: app.isPackaged }),
+    fetch: (url, init) =>
+      net.fetch(url, init).then((res) => ({ ok: res.ok })),
+  })
+  const launchedAt = Date.now()
+  telemetry.track('app_open', { first_launch: telemetry.isFirstLaunch() })
+
+  // Watch scan lifecycle for scan_complete / scan_error without the renderer being involved.
+  let scanStartedAt = 0
+  const onEngineEvent = (event: EngineEvent) => {
+    if (event.type === 'state') {
+      if (event.state.status === 'scanning') scanStartedAt = Date.now()
+      else if (event.state.status === 'ready') {
+        telemetry.track('scan_complete', {
+          files: event.state.entries,
+          bytes: event.state.totalSize,
+          duration_ms: scanStartedAt ? Date.now() - scanStartedAt : 0,
+          unreadable: event.state.errors,
+          incomplete: event.state.incomplete,
+        })
+      } else if (event.state.status === 'error') {
+        telemetry.track('scan_error', {})
+      }
+    }
+    win?.webContents.send(CHANNELS.engineEvent, event)
+  }
+
   const engine = new EngineClient(
     unpackedPath(join(__dirname, 'engine.js')),
     {
@@ -58,7 +96,7 @@ void app.whenReady().then(() => {
       snapshotPath: join(app.getPath('userData'), 'snapshot.bin'),
       home,
     },
-    (event) => win?.webContents.send(CHANNELS.engineEvent, event),
+    onEngineEvent,
   )
 
   registerIpc({
@@ -68,6 +106,7 @@ void app.whenReady().then(() => {
     window: () => win,
     env: process.env,
     isPackaged: app.isPackaged,
+    telemetry,
   })
   win = createWindow()
   void engine.call('init')
@@ -76,9 +115,10 @@ void app.whenReady().then(() => {
   app.on('before-quit', (event) => {
     if (flushed) return
     event.preventDefault()
+    telemetry.track('app_quit', { session_seconds: Math.round((Date.now() - launchedAt) / 1000) })
     // The worker may have died or hung: never let a stuck/rejected flush() block quitting.
     const timeout = new Promise<void>((resolve) => setTimeout(resolve, 3000))
-    void Promise.race([engine.call('flush').catch(() => {}), timeout]).finally(() => {
+    void Promise.race([Promise.all([engine.call('flush').catch(() => {}), telemetry.flush()]), timeout]).finally(() => {
       flushed = true
       void engine.terminate()
       app.quit()

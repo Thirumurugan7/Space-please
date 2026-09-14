@@ -3,6 +3,7 @@ import type { Row } from '../../shared/types'
 import { ConfirmDialog, type ConfirmRequest } from '../components/ConfirmDialog'
 import { Toasts, type Toast } from '../components/Toasts'
 import { formatBytes, plural } from './format'
+import { track } from './track'
 
 const LARGE_BYTES = 10_000_000_000
 const LARGE_COUNT = 500
@@ -82,6 +83,7 @@ export function ActionsProvider({ children }: { children: ReactNode }) {
       if (res.trashed.length > 0) {
         const trashed = new Set(res.trashed)
         const size = rows.filter((r) => trashed.has(r.id)).reduce((sum, r) => sum + r.size, 0)
+        track('trash', { items: res.trashed.length, bytes: size })
         toast(`Moved ${plural(res.trashed.length, 'item')} (${formatBytes(size)}) to the Trash`)
       }
       if (res.missing.length > 0) {
@@ -95,13 +97,18 @@ export function ActionsProvider({ children }: { children: ReactNode }) {
       trash,
       confirm,
       toast,
-      reveal: (row) => void window.sa.actions.reveal(row.id),
+      reveal: (row) => {
+        track('reveal')
+        void window.sa.actions.reveal(row.id)
+      },
       open: (row) => {
+        track('open_file')
         void window.sa.actions.open(row.id).then((error) => {
           if (error) toast(error, 'error')
         })
       },
       copyPaths: (rows) => {
+        track('copy_paths', { count: rows.length })
         void window.sa.actions.copyPaths(rows.map((r) => r.id)).then(() => toast(`Copied ${plural(rows.length, 'path')}`))
       },
     }

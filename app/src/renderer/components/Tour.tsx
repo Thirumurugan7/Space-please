@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState, type CSSProperties } from 'react'
+import { track } from '../lib/track'
 import { TOUR_STEPS, stepAfter } from '../lib/tour'
 
 interface Props {
@@ -24,6 +25,22 @@ export function Tour({ onClose }: Props) {
   const primaryRef = useRef<HTMLButtonElement>(null)
   const step = TOUR_STEPS[index]
   const last = index === TOUR_STEPS.length - 1
+
+  useEffect(() => {
+    track('tour_start')
+  }, [])
+
+  // The tour closes either by finishing the last step or by skipping partway; report which.
+  const indexRef = useRef(index)
+  indexRef.current = index
+  const skip = useCallback(() => {
+    track('tour_skip', { step: indexRef.current })
+    onClose()
+  }, [onClose])
+  const finish = useCallback(() => {
+    track('tour_complete', { steps: TOUR_STEPS.length })
+    onClose()
+  }, [onClose])
 
   const measure = useCallback(() => {
     const el = step.target ? document.querySelector<HTMLElement>(`[data-tour="${step.target}"]`) : null
@@ -51,21 +68,21 @@ export function Tour({ onClose }: Props) {
   const go = useCallback(
     (direction: 'next' | 'back') => {
       const next = stepAfter(index, direction)
-      if (next === null) onClose()
+      if (next === null) finish()
       else setIndex(next)
     },
-    [index, onClose],
+    [index, finish],
   )
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === 'Escape') onClose()
+      if (e.key === 'Escape') skip()
       else if (e.key === 'ArrowRight') go('next')
       else if (e.key === 'ArrowLeft') go('back')
     }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
-  }, [go, onClose])
+  }, [go, skip])
 
   let cardStyle: CSSProperties | undefined
   if (box) {
@@ -97,7 +114,7 @@ export function Tour({ onClose }: Props) {
         </div>
         <div className="tour-actions">
           {!last ? (
-            <button type="button" className="button ghost" onClick={onClose}>
+            <button type="button" className="button ghost" onClick={skip}>
               Skip tour
             </button>
           ) : (

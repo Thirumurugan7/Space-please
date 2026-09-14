@@ -1546,6 +1546,89 @@ select option {
   margin-top: 6px;
 }
 
+/* Privacy settings */
+.settings-head {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.settings-icon {
+  display: grid;
+  place-items: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 9px;
+  color: var(--accent);
+  background: var(--accent-soft);
+}
+
+.switch-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 4px 0 2px;
+}
+
+.switch-text {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.switch-label {
+  font-weight: 600;
+}
+
+.switch-sub {
+  color: var(--haze);
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.settings-note {
+  font-size: 13px;
+}
+
+.switch {
+  flex: none;
+  position: relative;
+  width: 44px;
+  height: 26px;
+  margin-top: 2px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
+  background: var(--line-strong);
+  cursor: pointer;
+  transition: background 0.18s ease;
+}
+
+.switch.on {
+  background: var(--accent);
+}
+
+.switch:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.switch-knob {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 3px rgb(0 0 0 / 0.3);
+  transition: transform 0.18s ease;
+}
+
+.switch.on .switch-knob {
+  transform: translateX(18px);
+}
+
 @keyframes fade-in {
   from {
     opacity: 0;

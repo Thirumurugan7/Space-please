@@ -4,6 +4,7 @@ import { useActions } from '../lib/actions'
 import { formatBytes, formatCount, nowSeconds, plural, relativeTime } from '../lib/format'
 import { FdaBanner } from './FdaBanner'
 import { Icon, type IconName } from './Icon'
+import { PrivacySettings } from './PrivacySettings'
 
 interface Props {
   state: ScanState | null
@@ -16,6 +17,7 @@ export function Sidebar({ state, progress, onStartTour }: Props) {
   const [home, setHome] = useState<string | null>(null)
   const [fda, setFda] = useState<FdaStatus>('unknown')
   const [disk, setDisk] = useState<DiskInfo | null>(null)
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   useEffect(() => {
     void window.sa.system.home().then(setHome)
@@ -129,6 +131,13 @@ export function Sidebar({ state, progress, onStartTour }: Props) {
         <Icon name="sparkle" size={15} />
         Take the tour
       </button>
+
+      <button type="button" className="tour-link" onClick={() => setSettingsOpen(true)}>
+        <Icon name="shield" size={15} />
+        Privacy
+      </button>
+
+      {settingsOpen && <PrivacySettings onClose={() => setSettingsOpen(false)} />}
 
       {disk && (
         <div className="disk-meter" aria-label="Disk usage">

@@ -16,6 +16,13 @@ vi.mock('electron', () => ({
 
 const { registerIpc } = await import('../../src/main/ipc')
 
+const telemetryStub = {
+  track: vi.fn(),
+  trackFromRenderer: vi.fn(),
+  getState: () => ({ enabled: true, active: false }),
+  setEnabled: vi.fn(),
+} as unknown as Parameters<typeof registerIpc>[0]['telemetry']
+
 function baseDeps(overrides: Partial<Parameters<typeof registerIpc>[0]> = {}) {
   return {
     engine: {} as never,
@@ -24,6 +31,7 @@ function baseDeps(overrides: Partial<Parameters<typeof registerIpc>[0]> = {}) {
     window: () => null,
     env: {},
     isPackaged: false,
+    telemetry: telemetryStub,
     ...overrides,
   }
 }

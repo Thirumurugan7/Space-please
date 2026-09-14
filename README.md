@@ -182,7 +182,7 @@ Right-click any row for **Open**, **Reveal in Finder**, **Copy Path** and **Move
 - **Nothing is deleted permanently.** Every removal uses the macOS Trash, so you can put items back from Finder.
 - **Protected locations.** `/`, `/System`, `/usr`, `/bin`, `/sbin`, `/Library/Apple`, the folder you scanned, your Home folder and Space-please itself can't be moved to the Trash, even by accident.
 - **Confirmation first.** You always see what you're about to remove and its total size, with a second confirmation for large removals.
-- **Private by design.** Space-please makes no network requests, has no analytics and no account. Scan results stay in `~/Library/Application Support/Space-please` on your Mac.
+- **Private by design.** Your files, their names and paths never leave your Mac, and there's no account. Scan results stay in `~/Library/Application Support/Space-please`. The app sends anonymous usage stats (which features are used, scan and cleanup counts, app and macOS version) to help improve it; no file names, paths or search text are ever included. Turn it off any time under **Privacy** in the sidebar.
 - **Read-only scanning.** The scanner only reads file metadata (names, sizes, dates); it never opens your files, except to compare possible duplicates when you ask it to.
 
 ## Build from source
@@ -307,7 +307,7 @@ Use Node 24.21.0: `nvm install && nvm use`.
 Yes. It's open source under the MIT licence.
 
 **Does it upload anything?**
-No. It has no network access, analytics or accounts.
+Your files, their names and paths never leave your Mac, and there's no account. The app does send anonymous usage stats (features used, scan and cleanup counts, app and macOS version — never file names, paths or search text) to help improve it. You can turn this off under **Privacy** in the sidebar.
 
 **Can it delete the wrong thing?**
 Nothing happens without your confirmation, items only go to the Trash (so they can be restored), and critical system locations are blocked.
