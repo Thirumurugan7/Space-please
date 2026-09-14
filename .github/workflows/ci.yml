@@ -1,0 +1,52 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  unit:
+    name: Typecheck & unit tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - run: npm ci
+        working-directory: app
+      - run: npm run typecheck
+        working-directory: app
+      - run: npm test
+        working-directory: app
+
+  e2e:
+    name: Scanner & end-to-end
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      # The native Swift scanner the app shells out to; e2e can't scan without it.
+      - run: npm run scanner:build
+      - run: npm run scanner:test
+      - run: npm ci
+        working-directory: app
+      - run: npm run e2e
+        working-directory: app
+        env:
+          # Belt and braces: telemetry already auto-disables under SA_USER_DATA in e2e.
+          SA_TELEMETRY: '0'
+      - if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report
+          path: app/playwright-report
+          if-no-files-found: ignore
