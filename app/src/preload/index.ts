@@ -21,6 +21,9 @@ const api: SaApi = {
     findDuplicates: () => invoke(C.cleanupDuplicates),
     cancelDuplicates: () => invoke(C.cleanupCancelDuplicates),
   },
+  report: {
+    get: (options) => invoke(C.reportGet, options),
+  },
   actions: {
     trash: (ids) => invoke(C.actionsTrash, ids),
     reveal: (id) => invoke(C.actionsReveal, id),

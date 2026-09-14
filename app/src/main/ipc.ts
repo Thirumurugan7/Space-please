@@ -1,7 +1,7 @@
 import { access } from 'node:fs/promises'
 import { BrowserWindow, clipboard, dialog, ipcMain, shell } from 'electron'
 import { CHANNELS as C } from '../shared/api'
-import type { SearchQuery, Sort, TrashResult } from '../shared/types'
+import type { ReportOptions, SearchQuery, Sort, TrashResult } from '../shared/types'
 import type { EngineClient } from './engineClient'
 import type { GuardContext } from './protectedPaths'
 import { FDA_SETTINGS_URL, diskInfo, fdaStatus } from './system'
@@ -38,6 +38,7 @@ export function registerIpc({ engine, home, appPath, window, env, isPackaged }: 
   handle(C.cleanupCategories, (threshold: number) => engine.call('cleanup', threshold))
   handle(C.cleanupDuplicates, () => engine.call('findDuplicates'))
   handle(C.cleanupCancelDuplicates, () => engine.call('cancelDuplicates'))
+  handle(C.reportGet, (options: ReportOptions) => engine.call('report', options))
 
   handle(C.actionsTrash, async (ids: number[]): Promise<TrashResult> => {
     const items = await engine.call('paths', ids)

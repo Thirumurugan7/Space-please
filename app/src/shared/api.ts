@@ -6,9 +6,11 @@ import type {
   EngineEvent,
   FdaStatus,
   Page,
+  ReportOptions,
   ScanState,
   SearchQuery,
   Sort,
+  SpaceReport,
   SunburstNode,
   TrashResult,
 } from './types'
@@ -30,6 +32,10 @@ export interface SaApi {
     categories(largeThreshold: number): Promise<CleanupCategory[]>
     findDuplicates(): Promise<DuplicatesResult>
     cancelDuplicates(): Promise<void>
+  }
+  report: {
+    /** Null when there is no scan yet. */
+    get(options: ReportOptions): Promise<SpaceReport | null>
   }
   actions: {
     trash(ids: number[]): Promise<TrashResult>
@@ -62,6 +68,7 @@ export const CHANNELS = {
   cleanupCategories: 'cleanup:categories',
   cleanupDuplicates: 'cleanup:duplicates',
   cleanupCancelDuplicates: 'cleanup:cancelDuplicates',
+  reportGet: 'report:get',
   actionsTrash: 'actions:trash',
   actionsReveal: 'actions:reveal',
   actionsOpen: 'actions:open',

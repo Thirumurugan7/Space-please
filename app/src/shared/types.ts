@@ -106,6 +106,44 @@ export interface TrashResult {
   rejected: { path: string; reason: string }[]
 }
 
+/** How careful the user should be before acting on a suggestion. */
+export type SuggestionSafety = 'safe' | 'review' | 'your-call'
+
+export interface ReportSuggestion {
+  id: CleanupCategoryId
+  title: string
+  advice: string
+  safety: SuggestionSafety
+  total: number
+  count: number
+  items: Row[]
+}
+
+export interface ReportFileList {
+  total: number
+  count: number
+  items: Row[]
+}
+
+export interface ReportOptions {
+  largeThreshold: number
+  /** Files not modified for at least this many days are stale. */
+  staleDays: number
+  /** Files modified within this many days are recent. */
+  recentDays: number
+}
+
+export interface SpaceReport {
+  /** Sum of all suggestions, counting overlapping items once. */
+  reclaimable: number
+  /** Non-empty suggestions, biggest first. */
+  suggestions: ReportSuggestion[]
+  /** Folder the stale/recent lists cover: home when it was scanned, otherwise the scan root. */
+  scope: string
+  stale: ReportFileList
+  recent: ReportFileList
+}
+
 export interface DiskInfo {
   total: number
   free: number

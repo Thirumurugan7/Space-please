@@ -5,14 +5,16 @@ import { ActionsProvider } from './lib/actions'
 import { formatBytes, formatCount } from './lib/format'
 import { CleanupTab } from './tabs/CleanupTab'
 import { OverviewTab } from './tabs/OverviewTab'
+import { ReportTab } from './tabs/ReportTab'
 import { SearchTab } from './tabs/SearchTab'
 
-type TabId = 'overview' | 'search' | 'cleanup'
+type TabId = 'overview' | 'search' | 'cleanup' | 'report'
 
 const TABS: { id: TabId; label: string }[] = [
   { id: 'overview', label: 'Overview' },
   { id: 'search', label: 'Search' },
   { id: 'cleanup', label: 'Cleanup' },
+  { id: 'report', label: 'Report' },
 ]
 
 export function App() {
@@ -69,6 +71,9 @@ export function App() {
               </section>
               <section className="panel" role="tabpanel" hidden={tab !== 'cleanup'}>
                 <CleanupTab state={state} revision={revision} />
+              </section>
+              <section className="panel" role="tabpanel" hidden={tab !== 'report'}>
+                <ReportTab state={state} revision={revision} />
               </section>
             </>
           ) : (

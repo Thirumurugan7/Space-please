@@ -1,9 +1,10 @@
 import { useEffect, useState } from 'react'
-import type { CleanupCategory, CleanupCategoryId, DuplicateProgress, DuplicatesResult, Row, ScanState } from '../../shared/types'
-import { NameCell, parentPath } from '../components/NameCell'
-import { useActions } from '../lib/actions'
+import type { CleanupCategory, CleanupCategoryId, DuplicateProgress, DuplicatesResult, ScanState } from '../../shared/types'
+import { CheckedActionBar } from '../components/CheckedActionBar'
+import { ItemList } from '../components/ItemList'
 import { allButOne, pruneDuplicates } from '../lib/cleanup'
-import { formatBytes, formatDate, plural } from '../lib/format'
+import { formatBytes, plural } from '../lib/format'
+import { useChecked } from '../lib/useChecked'
 
 interface Props {
   state: ScanState
@@ -20,11 +21,10 @@ const THRESHOLDS = [
 type Expanded = CleanupCategoryId | 'duplicates' | null
 
 export function CleanupTab({ state, revision }: Props) {
-  const actions = useActions()
+  const { checked, toggle, checkAll, drop, clear } = useChecked()
   const [threshold, setThreshold] = useState(1_000_000_000)
   const [categories, setCategories] = useState<CleanupCategory[] | null>(null)
   const [expanded, setExpanded] = useState<Expanded>(null)
-  const [checked, setChecked] = useState<Map<number, Row>>(new Map())
   const [dupes, setDupes] = useState<DuplicatesResult | null>(null)
   const [dupeProgress, setDupeProgress] = useState<DuplicateProgress | null>(null)
   const [finding, setFinding] = useState(false)
@@ -47,30 +47,15 @@ export function CleanupTab({ state, revision }: Props) {
   )
 
   useEffect(() => {
-    setChecked(new Map())
+    clear()
     setDupes(null)
     setDupeProgress(null)
-  }, [scanKey])
-
-  const toggle = (row: Row) =>
-    setChecked((m) => {
-      const next = new Map(m)
-      if (next.has(row.id)) next.delete(row.id)
-      else next.set(row.id, row)
-      return next
-    })
-
-  const checkAll = (rows: Row[]) =>
-    setChecked((m) => {
-      const next = new Map(m)
-      for (const r of rows) next.set(r.id, r)
-      return next
-    })
+  }, [scanKey, clear])
 
   const dropIds = (ids: number[]) => {
     if (ids.length === 0) return
+    drop(ids)
     const gone = new Set(ids)
-    setChecked((m) => new Map([...m].filter(([id]) => !gone.has(id))))
     setDupes((d) => (d ? pruneDuplicates(d, gone) : d))
   }
 
@@ -83,9 +68,6 @@ export function CleanupTab({ state, revision }: Props) {
       setFinding(false)
     }
   }
-
-  const checkedRows = [...checked.values()]
-  const checkedSize = checkedRows.reduce((n, r) => n + r.size, 0)
 
   return (
     <div className="cleanup">
@@ -103,21 +85,7 @@ export function CleanupTab({ state, revision }: Props) {
         </label>
       </div>
 
-      {checkedRows.length > 0 && (
-        <div className="action-bar sticky" role="toolbar" aria-label="Checked items">
-          <span className="action-bar-summary">
-            {plural(checkedRows.length, 'item')} checked · {formatBytes(checkedSize)}
-          </span>
-          <div className="action-bar-buttons">
-            <button type="button" className="button danger" onClick={() => void actions.trash(checkedRows).then(dropIds)}>
-              Move to Trash
-            </button>
-            <button type="button" className="button ghost" onClick={() => setChecked(new Map())}>
-              Clear
-            </button>
-          </div>
-        </div>
-      )}
+      <CheckedActionBar checked={checked} onRemoved={dropIds} onClear={clear} />
 
       <div className="cards">
         {categories === null && <p className="muted">Looking for things to clean up…</p>}
@@ -225,38 +193,5 @@ export function CleanupTab({ state, revision }: Props) {
         </section>
       </div>
     </div>
-  )
-}
-
-interface ItemListProps {
-  rows: Row[]
-  checked: Map<number, Row>
-  onToggle: ((row: Row) => void) | null
-  onOpenLabel?: string
-}
-
-function ItemList({ rows, checked, onToggle, onOpenLabel }: ItemListProps) {
-  const actions = useActions()
-  return (
-    <ul className="item-list">
-      {rows.map((r) => (
-        <li key={r.id} className="item">
-          {onToggle ? (
-            <input type="checkbox" aria-label={`Select ${r.name}`} checked={checked.has(r.id)} onChange={() => onToggle(r)} />
-          ) : (
-            <span className="checkbox-space" />
-          )}
-          <NameCell row={r} />
-          <span className="path-text" title={r.path}>
-            {parentPath(r.path)}
-          </span>
-          <span className="muted">{formatDate(r.mtime)}</span>
-          <span className="item-size">{formatBytes(r.size)}</span>
-          <button type="button" className="button ghost" onClick={() => (onOpenLabel ? actions.open(r) : actions.reveal(r))}>
-            {onOpenLabel ?? 'Reveal'}
-          </button>
-        </li>
-      ))}
-    </ul>
   )
 }

@@ -4,14 +4,17 @@ import type {
   DuplicatesResult,
   EngineEvent,
   Page,
+  ReportOptions,
   ScanState,
   SearchQuery,
   Sort,
+  SpaceReport,
   SunburstNode,
 } from '../shared/types'
 import { cleanupCategories } from './cleanup'
 import { findDuplicates } from './duplicates'
 import { SearchCache, breadcrumb, childrenPage, sunburst } from './query'
+import { spaceReport } from './report'
 import { ScanController } from './scanController'
 import { loadSnapshot, saveSnapshot } from './snapshot'
 import type { Tree } from './tree'
@@ -132,6 +135,11 @@ export class Engine {
   cleanup(largeThreshold: number): CleanupCategory[] {
     if (!this.tree) return []
     return cleanupCategories(this.tree, { home: this.opts.home, now: nowSeconds(), largeThreshold })
+  }
+
+  report(options: ReportOptions): SpaceReport | null {
+    if (!this.tree) return null
+    return spaceReport(this.tree, { ...options, home: this.opts.home, now: nowSeconds() })
   }
 
   async findDuplicates(): Promise<DuplicatesResult> {

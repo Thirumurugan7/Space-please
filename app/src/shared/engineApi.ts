@@ -11,6 +11,7 @@ export const ENGINE_METHODS = [
   'sunburst',
   'breadcrumb',
   'cleanup',
+  'report',
   'findDuplicates',
   'cancelDuplicates',
   'paths',

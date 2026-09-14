@@ -882,6 +882,97 @@ select {
   width: 18px;
 }
 
+/* Report */
+.report {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 16px 20px;
+  overflow-y: auto;
+}
+
+.report-hero {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 24px;
+  padding: 18px 20px;
+  border-radius: 14px;
+  background: var(--accent-soft);
+}
+
+.report-reclaimable {
+  font-size: 34px;
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+}
+
+.report-disk {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 2px;
+  flex: none;
+}
+
+.report-heading {
+  font-size: 16px;
+  margin-top: 6px;
+}
+
+.report-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.report-section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 16px;
+}
+
+.safety {
+  display: inline-block;
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 600;
+  vertical-align: middle;
+  white-space: nowrap;
+}
+
+.safety.safe {
+  background: #d8f3dc;
+  color: #1b5e20;
+}
+
+.safety.review {
+  background: #fff1c2;
+  color: #6b4e00;
+}
+
+.safety.your-call {
+  background: var(--danger-soft);
+  color: var(--danger);
+}
+
+@media (prefers-color-scheme: dark) {
+  .safety.safe {
+    background: #1f3d27;
+    color: #9be3ae;
+  }
+
+  .safety.review {
+    background: #3d3314;
+    color: #f5dd9a;
+  }
+}
+
 /* Overlays */
 .modal-backdrop {
   position: fixed;
