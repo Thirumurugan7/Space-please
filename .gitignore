@@ -6,3 +6,4 @@ app/dist/
 app/test-results/
 app/playwright-report/
 .superpowers/
+.vercel/

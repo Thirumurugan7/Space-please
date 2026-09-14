@@ -14,6 +14,12 @@
 </p>
 
 <p align="center">
+  <a href="https://space-please.vercel.app">Website</a> ·
+  <a href="https://github.com/Thirumurugan7/Space-please/releases/latest">Releases</a> ·
+  <a href="https://github.com/Thirumurugan7/Space-please/issues">Report an issue</a>
+</p>
+
+<p align="center">
   <a href="https://github.com/Thirumurugan7/Space-please/releases/latest"><img src="https://img.shields.io/github/v/release/Thirumurugan7/Space-please?label=latest%20release" alt="Latest release"></a>
   <img src="https://img.shields.io/badge/platform-macOS%2015%2B%20%7C%20Apple%20Silicon-3fd0f5" alt="Platform: macOS 15 or later on Apple Silicon">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-5ee6b0" alt="MIT licence"></a>
