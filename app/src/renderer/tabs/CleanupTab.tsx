@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import type { CleanupCategory, CleanupCategoryId, DuplicateProgress, DuplicatesResult, ScanState } from '../../shared/types'
 import { CheckedActionBar } from '../components/CheckedActionBar'
+import { CategoryTile } from '../components/Icon'
 import { ItemList } from '../components/ItemList'
 import { allButOne, pruneDuplicates } from '../lib/cleanup'
 import { formatBytes, plural } from '../lib/format'
@@ -97,9 +98,12 @@ export function CleanupTab({ state, revision }: Props) {
               aria-expanded={expanded === cat.id}
               onClick={() => setExpanded(expanded === cat.id ? null : cat.id)}
             >
-              <div>
-                <h3>{cat.title}</h3>
-                <p className="muted">{cat.description}</p>
+              <div className="card-lead">
+                <CategoryTile id={cat.id} />
+                <div>
+                  <h3>{cat.title}</h3>
+                  <p className="muted">{cat.description}</p>
+                </div>
               </div>
               <div className="card-total">
                 <strong>{formatBytes(cat.total)}</strong>
@@ -132,9 +136,12 @@ export function CleanupTab({ state, revision }: Props) {
 
         <section className="card">
           <div className="card-header static">
-            <div>
-              <h3>Duplicate files</h3>
-              <p className="muted">Files of 1 MB or more with identical contents.</p>
+            <div className="card-lead">
+              <CategoryTile id="duplicates" />
+              <div>
+                <h3>Duplicate files</h3>
+                <p className="muted">Files of 1 MB or more with identical contents.</p>
+              </div>
             </div>
             <div className="card-total">
               {dupes ? (

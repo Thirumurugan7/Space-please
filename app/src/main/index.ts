@@ -18,7 +18,11 @@ function createWindow(): BrowserWindow {
     minHeight: 600,
     title: 'Space Analyser',
     titleBarStyle: 'hiddenInset',
-    backgroundColor: '#f5f5f7',
+    // Transparent background + vibrancy gives the sidebar real macOS frosted glass; the renderer
+    // paints its own gradient behind the main content.
+    backgroundColor: '#00000000',
+    vibrancy: 'under-window',
+    visualEffectState: 'active',
     show: false,
     webPreferences: {
       preload: join(__dirname, '../preload/index.js'),

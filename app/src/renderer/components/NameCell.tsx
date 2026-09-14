@@ -1,4 +1,5 @@
 import type { FileType, Row } from '../../shared/types'
+import { Icon, TYPE_ICONS } from './Icon'
 
 export const TYPE_LABELS: Record<FileType, string> = {
   folder: 'Folders',
@@ -13,9 +14,12 @@ export const TYPE_LABELS: Record<FileType, string> = {
 }
 
 export function NameCell({ row }: { row: Row }) {
+  const kind = row.kind === 'symlink' ? 'link' : row.type
   return (
     <span className="name-cell" title={row.path}>
-      <span className={`type-icon t-${row.kind === 'symlink' ? 'link' : row.type}`} aria-hidden />
+      <span className={`type-tile t-${kind}`} aria-hidden>
+        <Icon name={TYPE_ICONS[kind]} size={12} />
+      </span>
       <span className="name-text">{row.name}</span>
     </span>
   )

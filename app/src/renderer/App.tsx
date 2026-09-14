@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import type { ScanProgress, ScanState } from '../shared/types'
+import { Icon, type IconName } from './components/Icon'
 import { Sidebar } from './components/Sidebar'
 import { ActionsProvider } from './lib/actions'
 import { formatBytes, formatCount } from './lib/format'
@@ -10,11 +11,11 @@ import { SearchTab } from './tabs/SearchTab'
 
 type TabId = 'overview' | 'search' | 'cleanup' | 'report'
 
-const TABS: { id: TabId; label: string }[] = [
-  { id: 'overview', label: 'Overview' },
-  { id: 'search', label: 'Search' },
-  { id: 'cleanup', label: 'Cleanup' },
-  { id: 'report', label: 'Report' },
+const TABS: { id: TabId; label: string; icon: IconName }[] = [
+  { id: 'overview', label: 'Overview', icon: 'overview' },
+  { id: 'search', label: 'Search', icon: 'search' },
+  { id: 'cleanup', label: 'Cleanup', icon: 'sparkle' },
+  { id: 'report', label: 'Report', icon: 'report' },
 ]
 
 export function App() {
@@ -56,6 +57,7 @@ export function App() {
                   disabled={!ready}
                   onClick={() => setTab(t.id)}
                 >
+                  <Icon name={t.icon} size={15} />
                   {t.label}
                 </button>
               ))}
@@ -64,7 +66,7 @@ export function App() {
           {ready ? (
             <>
               <section className="panel" role="tabpanel" hidden={tab !== 'overview'}>
-                <OverviewTab state={state} revision={revision} />
+                <OverviewTab state={state} revision={revision} onReviewSuggestions={() => setTab('report')} />
               </section>
               <section className="panel" role="tabpanel" hidden={tab !== 'search'}>
                 <SearchTab state={state} revision={revision} />
@@ -89,9 +91,11 @@ function Placeholder({ state, progress }: { state: ScanState | null; progress: S
   if (state?.status === 'scanning') {
     return (
       <div className="placeholder">
-        <div className="spinner" aria-hidden />
+        <div className="scan-orb" aria-hidden>
+          <span />
+        </div>
+        <p className="big-number">{formatCount(progress?.entries ?? 0)}</p>
         <h1>Scanning {state.root}</h1>
-        <p className="big-number">{formatCount(progress?.entries ?? 0)} items</p>
         <p className="muted">{formatBytes(progress?.bytes ?? 0)} found so far</p>
       </div>
     )
@@ -107,8 +111,9 @@ function Placeholder({ state, progress }: { state: ScanState | null; progress: S
   }
   return (
     <div className="placeholder">
+      <div className="welcome-mark" aria-hidden />
       <h1>See what's filling your Mac</h1>
-      <p className="muted">Choose Macintosh HD, your Home folder, or any folder in the sidebar to start a scan.</p>
+      <p className="muted">Choose Macintosh HD, your Home folder or any folder in the sidebar to start a scan.</p>
     </div>
   )
 }

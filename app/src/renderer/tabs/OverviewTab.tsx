@@ -3,6 +3,7 @@ import type { Crumb, DiskInfo, Row, ScanState, Sort, SunburstNode } from '../../
 import { ActionBar } from '../components/ActionBar'
 import { ContextMenu, type MenuState } from '../components/ContextMenu'
 import { NameCell } from '../components/NameCell'
+import { Ring } from '../components/Ring'
 import { Sunburst } from '../components/Sunburst'
 import { VirtualTable, type Column } from '../components/VirtualTable'
 import { useActions } from '../lib/actions'
@@ -12,9 +13,10 @@ import { emptySelection, withoutIds } from '../lib/selection'
 interface Props {
   state: ScanState
   revision: number
+  onReviewSuggestions(): void
 }
 
-export function OverviewTab({ state, revision }: Props) {
+export function OverviewTab({ state, revision, onReviewSuggestions }: Props) {
   const actions = useActions()
   const [dirId, setDirId] = useState(0)
   const [sort, setSort] = useState<Sort>({ key: 'size', dir: 'desc' })
@@ -23,6 +25,7 @@ export function OverviewTab({ state, revision }: Props) {
   const [crumbs, setCrumbs] = useState<Crumb[]>([])
   const [chart, setChart] = useState<SunburstNode | null>(null)
   const [disk, setDisk] = useState<DiskInfo | null>(null)
+  const [reclaimable, setReclaimable] = useState(0)
   const scanKey = `${state.root}:${state.scannedAt}`
 
   useEffect(() => {
@@ -47,7 +50,14 @@ export function OverviewTab({ state, revision }: Props) {
   }, [dirId, revision])
 
   useEffect(() => {
-    void window.sa.system.disk().then(setDisk)
+    let live = true
+    void window.sa.system.disk().then((d) => live && setDisk(d))
+    void window.sa.report
+      .get({ largeThreshold: 1_000_000_000, staleDays: 365, recentDays: 7 })
+      .then((r) => live && setReclaimable(r?.reclaimable ?? 0))
+    return () => {
+      live = false
+    }
   }, [revision])
 
   const navigate = (id: number) => {
@@ -58,11 +68,12 @@ export function OverviewTab({ state, revision }: Props) {
   const closeMenu = useCallback(() => setMenu(null), [])
   const removed = (ids: number[]) => setSelection((s) => withoutIds(s, ids))
   const parentSize = chart?.size ?? 0
+  const usedShare = disk && disk.total > 0 ? disk.used / disk.total : 0
 
   const columns: Column[] = [
     { id: 'name', label: 'Name', width: 'minmax(200px, 1fr)', sortKey: 'name', render: (r) => <NameCell row={r} /> },
     { id: 'size', label: 'Size', width: '90px', sortKey: 'size', align: 'right', render: (r) => formatBytes(r.size) },
-    { id: 'share', label: '% of Folder', width: '110px', render: (r) => <ShareBar fraction={parentSize > 0 ? r.size / parentSize : 0} /> },
+    { id: 'share', label: '% of Folder', width: '120px', render: (r) => <ShareBar fraction={parentSize > 0 ? r.size / parentSize : 0} /> },
     { id: 'items', label: 'Items', width: '80px', sortKey: 'items', align: 'right', render: (r) => (r.kind === 'dir' ? formatCount(r.items) : '—') },
     { id: 'mtime', label: 'Modified', width: '110px', sortKey: 'mtime', render: (r) => formatDate(r.mtime) },
   ]
@@ -74,13 +85,43 @@ export function OverviewTab({ state, revision }: Props) {
 
   return (
     <div className="overview">
-      <div className="stats">
-        <Stat label="Disk used" value={disk ? formatBytes(disk.used) : '—'} detail={disk ? `of ${formatBytes(disk.total)}` : ''} />
-        <Stat label="Available" value={disk ? formatBytes(disk.free) : '—'} />
-        <Stat label="Scanned" value={formatBytes(state.totalSize)} detail={state.root ?? ''} />
-        <Stat label="Items" value={formatCount(state.entries)} />
-        <Stat label="Skipped" value={formatCount(state.errors)} detail="unreadable" />
-      </div>
+      <section className="hero" aria-label="Storage">
+        <Ring fraction={usedShare} label="Disk usage" size={148} stroke={13}>
+          <span className="ring-figure">{disk ? Math.round(usedShare * 100) : '—'}%</span>
+          <span className="ring-caption">used</span>
+        </Ring>
+        <div className="hero-copy">
+          <h1 className="hero-title">{disk ? `${formatBytes(disk.free)} available` : 'Reading your disk…'}</h1>
+          {disk && (
+            <p className="muted">
+              {formatBytes(disk.used)} of {formatBytes(disk.total)} in use
+            </p>
+          )}
+          <dl className="facts">
+            <div>
+              <dt>Scanned</dt>
+              <dd>{formatBytes(state.totalSize)}</dd>
+            </div>
+            <div>
+              <dt>Items</dt>
+              <dd>{formatCount(state.entries)}</dd>
+            </div>
+            <div>
+              <dt>Unreadable</dt>
+              <dd>{formatCount(state.errors)}</dd>
+            </div>
+          </dl>
+        </div>
+        {reclaimable > 0 && (
+          <div className="hero-action">
+            <span className="hero-reclaim">{formatBytes(reclaimable)}</span>
+            <span className="muted">could be freed</span>
+            <button type="button" className="button primary large" onClick={onReviewSuggestions}>
+              Review suggestions
+            </button>
+          </div>
+        )}
+      </section>
 
       <nav className="breadcrumb" aria-label="Folder path">
         {crumbs.map((c, i) => (
@@ -104,7 +145,7 @@ export function OverviewTab({ state, revision }: Props) {
           ) : (
             <p className="muted">Nothing takes up space here.</p>
           )}
-          <p className="muted chart-hint">Click a ring to open a folder · click the centre to go up</p>
+          <p className="muted chart-hint">Click a ring to open a folder. Click the centre to go up.</p>
         </div>
         <div className="table-panel">
           <VirtualTable
@@ -125,20 +166,6 @@ export function OverviewTab({ state, revision }: Props) {
         </div>
       </div>
       <ContextMenu menu={menu} onClose={closeMenu} onRemoved={removed} />
-    </div>
-  )
-}
-
-function Stat({ label, value, detail }: { label: string; value: string; detail?: string }) {
-  return (
-    <div className="stat">
-      <div className="stat-label">{label}</div>
-      <div className="stat-value">{value}</div>
-      {detail ? (
-        <div className="stat-detail" title={detail}>
-          {detail}
-        </div>
-      ) : null}
     </div>
   )
 }

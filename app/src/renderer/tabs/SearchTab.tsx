@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import type { FileType, ScanState, SearchQuery, Sort } from '../../shared/types'
 import { ActionBar } from '../components/ActionBar'
 import { ContextMenu, type MenuState } from '../components/ContextMenu'
+import { Icon } from '../components/Icon'
 import { NameCell, TYPE_LABELS, parentPath } from '../components/NameCell'
 import { VirtualTable, type Column } from '../components/VirtualTable'
 import { useActions } from '../lib/actions'
@@ -88,14 +89,17 @@ export function SearchTab({ state, revision }: Props) {
   return (
     <div className="search">
       <div className="search-bar">
-        <input
-          type="search"
-          className="search-input"
-          placeholder="Search all files"
-          aria-label="Search all files"
-          value={text}
-          onChange={(e) => setText(e.target.value)}
-        />
+        <label className="search-field">
+          <Icon name="search" size={18} />
+          <input
+            type="search"
+            className="search-input"
+            placeholder="Search all files"
+            aria-label="Search all files"
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+          />
+        </label>
         <span className="result-count">{total === null ? '' : plural(total, 'result')}</span>
       </div>
       <div className="filters">

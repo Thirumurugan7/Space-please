@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react'
 import type { DiskInfo, ReportFileList, ReportSuggestion, ScanState, SpaceReport, SuggestionSafety } from '../../shared/types'
 import { CheckedActionBar } from '../components/CheckedActionBar'
+import { CategoryTile } from '../components/Icon'
 import { ItemList } from '../components/ItemList'
+import { Ring } from '../components/Ring'
 import { formatBytes, plural } from '../lib/format'
 import { useChecked } from '../lib/useChecked'
 
@@ -59,7 +61,16 @@ export function ReportTab({ state, revision }: Props) {
   return (
     <div className="report">
       <section className="report-hero" aria-label="Summary">
-        <div>
+        <Ring
+          fraction={disk && disk.used > 0 ? report.reclaimable / disk.used : 0}
+          label="Share of used space that could be freed"
+          size={120}
+          stroke={11}
+        >
+          <span className="ring-figure small">{disk && disk.used > 0 ? Math.round((report.reclaimable / disk.used) * 100) : 0}%</span>
+          <span className="ring-caption">of used</span>
+        </Ring>
+        <div className="report-hero-copy">
           <div className="stat-label">You could free up about</div>
           <div className="report-reclaimable">{formatBytes(report.reclaimable)}</div>
           <p className="muted">
@@ -96,9 +107,12 @@ export function ReportTab({ state, revision }: Props) {
         ))}
         <section className="card">
           <div className="card-header static">
-            <div>
-              <h3>Duplicate files</h3>
-              <p className="muted">Identical copies waste space. Run Find Duplicates on the Cleanup tab to check.</p>
+            <div className="card-lead">
+              <CategoryTile id="duplicates" />
+              <div>
+                <h3>Duplicate files</h3>
+                <p className="muted">Identical copies waste space. Run Find Duplicates on the Cleanup tab to check.</p>
+              </div>
             </div>
             <span className="safety review">{SAFETY_LABELS.review}</span>
           </div>
@@ -149,11 +163,14 @@ function SuggestionCard({ suggestion: s, open, onToggleOpen, checked, onToggle, 
   return (
     <section className="card">
       <button type="button" className="card-header" aria-expanded={open} onClick={onToggleOpen}>
-        <div>
-          <h3>
-            {s.title} <span className={`safety ${s.safety}`}>{SAFETY_LABELS[s.safety]}</span>
-          </h3>
-          <p className="muted">{s.advice}</p>
+        <div className="card-lead">
+          <CategoryTile id={s.id} />
+          <div>
+            <h3>
+              {s.title} <span className={`safety ${s.safety}`}>{SAFETY_LABELS[s.safety]}</span>
+            </h3>
+            <p className="muted">{s.advice}</p>
+          </div>
         </div>
         <div className="card-total">
           <strong>{formatBytes(s.total)}</strong>
