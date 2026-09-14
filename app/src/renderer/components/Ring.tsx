@@ -27,7 +27,8 @@ export function Ring({ fraction, label, size = 168, stroke = 14, children }: Pro
           </linearGradient>
         </defs>
         <circle className="ring-track" cx={centre} cy={centre} r={radius} strokeWidth={stroke} fill="none" />
-        {filled > 0 && (
+        {/* Below half a percent the rounded cap would render as a stray dot, so draw nothing. */}
+        {fraction >= 0.005 && (
           <circle
             className="ring-value"
             cx={centre}

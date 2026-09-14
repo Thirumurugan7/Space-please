@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Space-please: see what's filling your Mac</title>
+    <meta
+      name="description"
+      content="Space-please is a free, open-source disk space analyser for macOS. Scan your Mac, search every file, and free up space safely."
+    />
+    <meta property="og:title" content="Space-please" />
+    <meta property="og:description" content="See what's filling your Mac and free up space safely. Free and open source." />
+    <meta property="og:image" content="assets/screens/dark-overview.png" />
+    <link rel="icon" type="image/png" href="assets/icon.png" />
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+    <div class="glow glow-a" aria-hidden="true"></div>
+    <div class="glow glow-b" aria-hidden="true"></div>
+
+    <header class="nav">
+      <a class="brand" href="#top">
+        <img src="assets/icon.png" alt="" width="32" height="32" />
+        <span>Space-please</span>
+      </a>
+      <nav aria-label="Sections">
+        <a href="#features">Features</a>
+        <a href="#install">Install</a>
+        <a href="#safety">Safety</a>
+        <a href="#faq">FAQ</a>
+        <a href="https://github.com/Thirumurugan7/Space-please">GitHub</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero">
+        <img class="hero-icon" src="assets/icon.png" alt="Space-please app icon" width="112" height="112" />
+        <h1>See what's filling your Mac.</h1>
+        <p class="lede">
+          Space-please scans every file on your Mac in seconds, maps where your storage went, and helps you clear it
+          safely. Free, private and open source.
+        </p>
+        <div class="cta">
+          <a class="button primary" href="https://github.com/Thirumurugan7/Space-please/releases/latest/download/Space-please.dmg">
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M16.4 12.6c0-2.6 2.1-3.8 2.2-3.9-1.2-1.8-3.1-2-3.7-2-1.6-.2-3.1.9-3.9.9-.8 0-2-.9-3.4-.9-1.7 0-3.3 1-4.2 2.6-1.8 3.1-.5 7.7 1.3 10.2.9 1.2 1.9 2.6 3.2 2.6 1.3-.1 1.8-.8 3.3-.8 1.6 0 2 .8 3.4.8 1.4 0 2.3-1.3 3.1-2.5 1-1.4 1.4-2.8 1.4-2.9 0 0-2.7-1-2.7-4.1zM13.9 5c.7-.9 1.2-2 1-3.2-1 0-2.3.7-3 1.6-.7.8-1.2 2-1.1 3.1 1.1.1 2.3-.6 3.1-1.5z"/></svg>
+            Download for Mac
+          </a>
+          <a class="button" href="https://github.com/Thirumurugan7/Space-please">View source on GitHub</a>
+        </div>
+        <p class="fineprint">Version 1.0 for Apple Silicon Macs running macOS 15 or later.</p>
+        <figure class="hero-shot">
+          <img src="assets/screens/dark-overview.png" alt="Space-please Overview with storage ring, sunburst and folder table" />
+        </figure>
+      </section>
+
+      <section class="numbers" aria-label="At a glance">
+        <div><strong>5.8M</strong><span>files scanned in about 28 seconds</span></div>
+        <div><strong>0</strong><span>files ever deleted permanently</span></div>
+        <div><strong>0</strong><span>network requests, analytics or accounts</span></div>
+        <div><strong>MIT</strong><span>licensed and open source</span></div>
+      </section>
+
+      <section id="features" class="features">
+        <h2>Everything you need to reclaim space</h2>
+
+        <article class="feature">
+          <div class="feature-copy">
+            <h3>Overview</h3>
+            <p>
+              A storage ring shows how full your disk is. The sunburst maps every folder by size: click a ring to open
+              a folder, click the centre to go back up. The table beside it lists what's inside, biggest first.
+            </p>
+          </div>
+          <img src="assets/screens/light-overview.png" alt="Overview tab in light mode" loading="lazy" />
+        </article>
+
+        <article class="feature reverse">
+          <div class="feature-copy">
+            <h3>Search every file</h3>
+            <p>
+              Find anything by name across millions of files instantly. Filter by videos, images, archives, apps and
+              more, or by size and date, then act on the results straight away.
+            </p>
+          </div>
+          <img src="assets/screens/dark-search.png" alt="Search tab filtering for movies" loading="lazy" />
+        </article>
+
+        <article class="feature">
+          <div class="feature-copy">
+            <h3>Cleanup suggestions</h3>
+            <p>
+              Large files, old downloads, app caches, developer junk such as Xcode build data and node_modules, the
+              Trash, and duplicate files confirmed by content hashing. Tick what you don't need.
+            </p>
+          </div>
+          <img src="assets/screens/dark-cleanup.png" alt="Cleanup tab with large files expanded" loading="lazy" />
+        </article>
+
+        <article class="feature reverse">
+          <div class="feature-copy">
+            <h3>A report that tells you what to do</h3>
+            <p>
+              See how much you could free, with every suggestion rated Safe, Review first or Your call. Spot stale files
+              you haven't touched in years and what's been added recently.
+            </p>
+          </div>
+          <img src="assets/screens/light-report.png" alt="Report tab in light mode" loading="lazy" />
+        </article>
+
+        <article class="feature">
+          <div class="feature-copy">
+            <h3>A guided tour on first launch</h3>
+            <p>
+              New to Space-please? A short walkthrough highlights each option in the real app, from choosing what to
+              scan to deleting safely. Replay it anytime with Take the tour.
+            </p>
+          </div>
+          <img src="assets/screens/tour-choose.png" alt="Guided tour highlighting the scan options" loading="lazy" />
+        </article>
+      </section>
+
+      <section id="safety" class="safety">
+        <h2>Safe by design</h2>
+        <div class="safety-grid">
+          <div>
+            <h3>Trash, never delete</h3>
+            <p>Every removal goes to the macOS Trash, so anything can be put back from Finder.</p>
+          </div>
+          <div>
+            <h3>Protected system folders</h3>
+            <p>System locations, your Home folder, the scanned folder and the app itself can't be removed.</p>
+          </div>
+          <div>
+            <h3>Confirm before acting</h3>
+            <p>You always see the item count and total size first, with a second check for big removals.</p>
+          </div>
+          <div>
+            <h3>Stays on your Mac</h3>
+            <p>No uploads, analytics or accounts. Scan results are stored locally and nowhere else.</p>
+          </div>
+        </div>
+      </section>
+
+      <section id="install" class="install">
+        <h2>Install in a minute</h2>
+        <ol class="steps">
+          <li>
+            <h3>Download</h3>
+            <p>Get <a href="https://github.com/Thirumurugan7/Space-please/releases/latest/download/Space-please.dmg">Space-please.dmg</a> from the latest release.</p>
+          </li>
+          <li>
+            <h3>Drag to Applications</h3>
+            <p>Open the DMG and drag Space-please onto the Applications folder.</p>
+          </li>
+          <li>
+            <h3>Open it once from Settings</h3>
+            <p>
+              The app is free and not signed with a paid Apple certificate. The first time, click Done on the warning,
+              then go to System Settings, Privacy &amp; Security, and click Open Anyway.
+            </p>
+          </li>
+          <li>
+            <h3>Allow Full Disk Access</h3>
+            <p>
+              For complete results, turn on Space-please under System Settings, Privacy &amp; Security, Full Disk Access,
+              then reopen the app and scan.
+            </p>
+          </li>
+        </ol>
+        <div class="cta center">
+          <a class="button primary" href="https://github.com/Thirumurugan7/Space-please/releases/latest/download/Space-please.dmg">Download Space-please</a>
+          <a class="button" href="https://github.com/Thirumurugan7/Space-please/releases">All releases</a>
+        </div>
+        <details class="terminal">
+          <summary>Prefer the Terminal for the first launch?</summary>
+          <pre><code>xattr -dr com.apple.quarantine /Applications/Space-please.app</code></pre>
+        </details>
+      </section>
+
+      <section class="source">
+        <div>
+          <h2>Built in the open</h2>
+          <p>
+            A multithreaded Swift scanner feeds an Electron and React app with a worker-thread engine designed for
+            millions of files. Read the code, build it yourself, or contribute.
+          </p>
+          <a class="button" href="https://github.com/Thirumurugan7/Space-please#build-from-source">Build from source</a>
+        </div>
+        <pre><code>git clone https://github.com/Thirumurugan7/Space-please.git
+cd Space-please
+nvm install &amp;&amp; nvm use
+npm install --prefix app
+npm run dev</code></pre>
+      </section>
+
+      <section id="faq" class="faq">
+        <h2>Questions</h2>
+        <details>
+          <summary>Is Space-please really free?</summary>
+          <p>Yes. It's open source under the MIT licence, with no trials, subscriptions or ads.</p>
+        </details>
+        <details>
+          <summary>Which Macs does it support?</summary>
+          <p>Apple Silicon Macs (M1 or newer) running macOS 15 Sequoia or later.</p>
+        </details>
+        <details>
+          <summary>Why does macOS warn me when I first open it?</summary>
+          <p>
+            Apple shows this for apps that aren't signed with a paid developer certificate. Open it once through System
+            Settings, Privacy &amp; Security, Open Anyway, and it opens normally from then on.
+          </p>
+        </details>
+        <details>
+          <summary>Why should I give it Full Disk Access?</summary>
+          <p>
+            macOS hides some folders, such as Mail and Messages data, unless an app has Full Disk Access. Without it
+            Space-please still works, but those folders are skipped.
+          </p>
+        </details>
+        <details>
+          <summary>Can it delete something important by mistake?</summary>
+          <p>
+            Nothing is removed without your confirmation, items only go to the Trash where you can restore them, and
+            system folders are blocked entirely.
+          </p>
+        </details>
+        <details>
+          <summary>Does it work on Windows or Linux?</summary>
+          <p>Not yet. The scanner relies on macOS. Contributions for other platforms are welcome on GitHub.</p>
+        </details>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <div class="brand">
+        <img src="assets/icon.png" alt="" width="24" height="24" />
+        <span>Space-please</span>
+      </div>
+      <p>Open source under the MIT licence.</p>
+      <nav aria-label="Footer">
+        <a href="https://github.com/Thirumurugan7/Space-please">GitHub</a>
+        <a href="https://github.com/Thirumurugan7/Space-please/releases">Releases</a>
+        <a href="https://github.com/Thirumurugan7/Space-please/issues">Report an issue</a>
+      </nav>
+    </footer>
+  </body>
+</html>

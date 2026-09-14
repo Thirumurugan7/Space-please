@@ -25,6 +25,12 @@ const RECENT_OPTIONS = [
   { label: '30 days', value: 30 },
 ]
 
+function sharePercent(part: number, whole: number): string {
+  if (whole <= 0 || part <= 0) return '0%'
+  const pct = (part / whole) * 100
+  return pct < 1 ? '<1%' : `${Math.round(pct)}%`
+}
+
 const SAFETY_LABELS: Record<SuggestionSafety, string> = {
   safe: 'Safe',
   review: 'Review first',
@@ -67,7 +73,7 @@ export function ReportTab({ state, revision }: Props) {
           size={120}
           stroke={11}
         >
-          <span className="ring-figure small">{disk && disk.used > 0 ? Math.round((report.reclaimable / disk.used) * 100) : 0}%</span>
+          <span className="ring-figure small">{sharePercent(report.reclaimable, disk?.used ?? 0)}</span>
           <span className="ring-caption">of used</span>
         </Ring>
         <div className="report-hero-copy">

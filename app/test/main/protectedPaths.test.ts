@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { bundlePath, protectionReason } from '../../src/main/protectedPaths'
 
-const ctx = { appPath: '/Applications/Space Analyser.app', scanRoot: '/', home: '/Users/me' }
+const ctx = { appPath: '/Applications/Space-please.app', scanRoot: '/', home: '/Users/me' }
 
 describe('protectionReason', () => {
   it.each([
@@ -14,7 +14,7 @@ describe('protectionReason', () => {
     ['/Users/me', 'home folder'],
     ['/Users/me/', 'home folder'],
     ['/Applications', 'cannot trash itself'],
-    ['/Applications/Space Analyser.app/Contents', 'cannot trash itself'],
+    ['/Applications/Space-please.app/Contents', 'cannot trash itself'],
     ['relative/path', 'absolute paths'],
   ])('rejects %s', (path, reason) => {
     expect(protectionReason(path, ctx)).toContain(reason)
@@ -39,7 +39,7 @@ describe('protectionReason', () => {
 
 describe('bundlePath', () => {
   it('extracts the .app bundle from an executable path', () => {
-    expect(bundlePath('/Applications/Space Analyser.app/Contents/MacOS/Space Analyser')).toBe('/Applications/Space Analyser.app')
+    expect(bundlePath('/Applications/Space-please.app/Contents/MacOS/Space-please')).toBe('/Applications/Space-please.app')
     expect(bundlePath('/repo/app/node_modules/electron/dist/Electron.app/Contents/MacOS/Electron')).toBe(
       '/repo/app/node_modules/electron/dist/Electron.app',
     )

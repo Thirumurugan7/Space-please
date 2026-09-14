@@ -20,7 +20,7 @@ function baseDeps(overrides: Partial<Parameters<typeof registerIpc>[0]> = {}) {
   return {
     engine: {} as never,
     home: '/Users/me',
-    appPath: '/Applications/Space Analyser.app',
+    appPath: '/Applications/Space-please.app',
     window: () => null,
     env: {},
     isPackaged: false,

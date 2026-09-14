@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { trashPaths, type TrashDeps } from '../../src/main/trash'
 
-const ctx = { appPath: '/Applications/Space Analyser.app', scanRoot: '/', home: '/Users/me' }
+const ctx = { appPath: '/Applications/Space-please.app', scanRoot: '/', home: '/Users/me' }
 
 function fakeDeps(existing: string[], failing: string[] = []) {
   const trashed: string[] = []

@@ -1,4 +1,4 @@
-/* Space Analyser — Midnight Glass (dark) and Pearl (light).
+/* Space-please — Midnight Glass (dark) and Pearl (light).
    One bold element per screen: the aurora rings and the sunburst. Everything else stays quiet. */
 
 :root {
@@ -1656,4 +1656,146 @@ select option {
   .overview-body {
     grid-template-columns: minmax(240px, 320px) 1fr;
   }
+}
+
+/* Guided tour */
+.tour-link {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: var(--radius-control);
+  background: transparent;
+  color: var(--ink-2);
+  font-weight: 540;
+  text-align: left;
+  cursor: pointer;
+}
+
+.tour-link svg {
+  color: var(--accent);
+}
+
+.tour-link:hover {
+  background: var(--surface-sunken);
+  color: var(--ink);
+}
+
+.tour {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+}
+
+.tour-scrim {
+  position: absolute;
+  inset: 0;
+  background: rgb(4 4 16 / 0.6);
+  backdrop-filter: blur(4px);
+  animation: fade-in 0.2s ease-out;
+}
+
+.tour-spotlight {
+  position: absolute;
+  border-radius: 14px;
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--aurora-a) 80%, transparent),
+    0 0 26px 4px var(--chart-glow),
+    0 0 0 9999px rgb(4 4 16 / 0.6);
+  pointer-events: none;
+  transition: top 0.3s ease, left 0.3s ease, width 0.3s ease, height 0.3s ease;
+}
+
+.tour-card {
+  position: absolute;
+  width: 360px;
+  padding: 22px;
+  border: 1px solid var(--line-strong);
+  border-radius: 20px;
+  background: var(--surface-strong);
+  box-shadow: var(--shadow-float);
+  backdrop-filter: blur(40px) saturate(160%);
+  animation: rise 0.22s ease-out;
+}
+
+.tour-card.centred {
+  top: 50%;
+  left: 50%;
+  width: 420px;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  animation: fade-in 0.22s ease-out;
+}
+
+.tour-mark {
+  width: 64px;
+  height: 64px;
+  margin: 0 auto 14px;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 36% 30%, rgb(255 255 255 / 0.7), transparent 30%),
+    conic-gradient(from 200deg, var(--aurora-a), var(--aurora-b), #ff7ab6, #f7c35f, var(--aurora-a));
+  box-shadow: 0 0 40px var(--chart-glow);
+  -webkit-mask: radial-gradient(circle, transparent 19px, #000 20px);
+  mask: radial-gradient(circle, transparent 19px, #000 20px);
+}
+
+.tour-count {
+  font-size: 12px;
+  color: var(--haze);
+  font-variant-numeric: tabular-nums;
+}
+
+.tour-card h2 {
+  margin-top: 4px;
+  font-size: 18px;
+  font-weight: 650;
+  letter-spacing: -0.015em;
+}
+
+.tour-body {
+  margin-top: 8px;
+  color: var(--ink-2);
+  line-height: 1.5;
+}
+
+.tour-dots {
+  display: flex;
+  gap: 5px;
+  margin-top: 16px;
+}
+
+.tour-card.centred .tour-dots {
+  justify-content: center;
+}
+
+.tour-dots span {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--line-strong);
+  transition: width 0.2s, background 0.2s;
+}
+
+.tour-dots span.done {
+  background: color-mix(in srgb, var(--accent) 45%, transparent);
+}
+
+.tour-dots span.on {
+  width: 18px;
+  background: linear-gradient(90deg, var(--aurora-a), var(--aurora-b));
+}
+
+.tour-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  margin-top: 18px;
+}
+
+.tour-actions-main {
+  display: flex;
+  gap: 8px;
 }

@@ -1,5 +1,5 @@
 {
-  "name": "space-analyser-root",
+  "name": "space-please-root",
   "private": true,
   "scripts": {
     "scanner:build": "swift build -c release --package-path scanner",

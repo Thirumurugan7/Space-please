@@ -16,7 +16,7 @@ function createWindow(): BrowserWindow {
     height: 820,
     minWidth: 960,
     minHeight: 600,
-    title: 'Space Analyser',
+    title: 'Space-please',
     titleBarStyle: 'hiddenInset',
     // Transparent background + vibrancy gives the sidebar real macOS frosted glass; the renderer
     // paints its own gradient behind the main content.

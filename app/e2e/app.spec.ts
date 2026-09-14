@@ -26,6 +26,13 @@ test('scan a folder, search it and move a file to the Trash', async () => {
   try {
     const page = await app.firstWindow()
 
+    const tour = page.getByRole('dialog', { name: 'Guided tour' })
+    await expect(tour.getByText('Welcome to Space-please')).toBeVisible()
+    await tour.getByRole('button', { name: 'Start the tour' }).click()
+    await expect(tour.getByText('Choose what to scan')).toBeVisible()
+    await tour.getByRole('button', { name: 'Skip tour' }).click()
+    await expect(tour).toHaveCount(0)
+
     await page.getByRole('button', { name: 'Choose folder…' }).click()
     await expect(page.getByTestId('scan-status')).toContainText('8 items', { timeout: 30_000 })
     await expect(page.getByRole('row', { name: /big\.bin/ })).toBeVisible()

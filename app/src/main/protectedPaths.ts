@@ -20,11 +20,11 @@ export function protectionReason(path: string, ctx: GuardContext): string | null
   const scanRoot = ctx.scanRoot !== null && ctx.scanRoot.length > 1 ? ctx.scanRoot.replace(/\/+$/, '') : ctx.scanRoot
   if (scanRoot !== null && p === scanRoot) return 'The scanned folder itself cannot be trashed'
   if (within(ctx.home, p)) return 'Your home folder cannot be trashed'
-  if (within(p, ctx.appPath) || within(ctx.appPath, p)) return 'Space Analyser cannot trash itself'
+  if (within(p, ctx.appPath) || within(ctx.appPath, p)) return 'Space-please cannot trash itself'
   return null
 }
 
-/** `/Applications/Space Analyser.app/Contents/MacOS/Space Analyser` → `/Applications/Space Analyser.app`. */
+/** `/Applications/Space-please.app/Contents/MacOS/Space-please` → `/Applications/Space-please.app`. */
 export function bundlePath(exePath: string): string {
   const i = exePath.indexOf('.app/')
   return i < 0 ? exePath : exePath.slice(0, i + 4)

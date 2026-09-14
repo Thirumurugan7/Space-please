@@ -8,9 +8,10 @@ import { Icon, type IconName } from './Icon'
 interface Props {
   state: ScanState | null
   progress: ScanProgress | null
+  onStartTour(): void
 }
 
-export function Sidebar({ state, progress }: Props) {
+export function Sidebar({ state, progress, onStartTour }: Props) {
   const actions = useActions()
   const [home, setHome] = useState<string | null>(null)
   const [fda, setFda] = useState<FdaStatus>('unknown')
@@ -45,6 +46,7 @@ export function Sidebar({ state, progress }: Props) {
   }
 
   const targets: { label: string; path: string | null; icon: IconName }[] = [
+    // Order matters for the guided tour, which describes these three options.
     { label: 'Macintosh HD', path: '/', icon: 'drive' },
     { label: 'Home', path: home, icon: 'home' },
   ]
@@ -55,10 +57,10 @@ export function Sidebar({ state, progress }: Props) {
       <div className="titlebar-space" />
       <div className="brand">
         <span className="brand-mark" aria-hidden />
-        <span>Space Analyser</span>
+        <span>Space-please</span>
       </div>
 
-      <nav className="targets" aria-label="Scan targets">
+      <nav className="targets" aria-label="Scan targets" data-tour="scan-targets">
         <div className="section-label">Scan</div>
         {targets.map((t) => (
           <button
@@ -83,7 +85,7 @@ export function Sidebar({ state, progress }: Props) {
         </button>
       </nav>
 
-      <section className="scan-status" data-testid="scan-status" aria-live="polite">
+      <section className="scan-status" data-testid="scan-status" data-tour="scan-status" aria-live="polite">
         {scanning ? (
           <>
             <div className="progress-bar indeterminate" />
@@ -122,6 +124,11 @@ export function Sidebar({ state, progress }: Props) {
       <div className="sidebar-spacer" />
 
       {fda === 'denied' && <FdaBanner />}
+
+      <button type="button" className="tour-link" data-tour="tour-button" onClick={onStartTour}>
+        <Icon name="sparkle" size={15} />
+        Take the tour
+      </button>
 
       {disk && (
         <div className="disk-meter" aria-label="Disk usage">

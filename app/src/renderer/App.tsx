@@ -1,9 +1,11 @@
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import type { ScanProgress, ScanState } from '../shared/types'
 import { Icon, type IconName } from './components/Icon'
 import { Sidebar } from './components/Sidebar'
+import { Tour } from './components/Tour'
 import { ActionsProvider } from './lib/actions'
 import { formatBytes, formatCount } from './lib/format'
+import { markTourComplete, shouldShowTour, type KeyValueStore } from './lib/tour'
 import { CleanupTab } from './tabs/CleanupTab'
 import { OverviewTab } from './tabs/OverviewTab'
 import { ReportTab } from './tabs/ReportTab'
@@ -18,11 +20,20 @@ const TABS: { id: TabId; label: string; icon: IconName }[] = [
   { id: 'report', label: 'Report', icon: 'report' },
 ]
 
+function browserStorage(): KeyValueStore | null {
+  try {
+    return window.localStorage
+  } catch {
+    return null
+  }
+}
+
 export function App() {
   const [state, setState] = useState<ScanState | null>(null)
   const [progress, setProgress] = useState<ScanProgress | null>(null)
   const [revision, setRevision] = useState(0)
   const [tab, setTab] = useState<TabId>('overview')
+  const [tourOpen, setTourOpen] = useState(() => shouldShowTour(browserStorage()))
 
   useEffect(() => {
     const off = window.sa.onEvent((event) => {
@@ -38,12 +49,17 @@ export function App() {
     return off
   }, [])
 
+  const closeTour = useCallback(() => {
+    markTourComplete(browserStorage())
+    setTourOpen(false)
+  }, [])
+
   const ready = state?.status === 'ready'
 
   return (
     <ActionsProvider>
       <div className="app">
-        <Sidebar state={state} progress={progress} />
+        <Sidebar state={state} progress={progress} onStartTour={() => setTourOpen(true)} />
         <main className="main">
           <header className="toolbar">
             <div className="tabs" role="tablist" aria-label="Views">
@@ -52,6 +68,7 @@ export function App() {
                   key={t.id}
                   type="button"
                   role="tab"
+                  data-tour={`tab-${t.id}`}
                   aria-selected={tab === t.id}
                   className={`tab${tab === t.id ? ' active' : ''}`}
                   disabled={!ready}
@@ -83,6 +100,7 @@ export function App() {
           )}
         </main>
       </div>
+      {tourOpen && <Tour onClose={closeTour} />}
     </ActionsProvider>
   )
 }

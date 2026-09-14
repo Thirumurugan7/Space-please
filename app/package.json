@@ -1,9 +1,16 @@
 {
-  "name": "space-analyser",
-  "productName": "Space Analyser",
-  "version": "0.1.0",
+  "name": "space-please",
+  "productName": "Space-please",
+  "version": "1.0.0",
+  "description": "See what is filling your Mac and free up space safely.",
+  "author": "Thirumurugan Sivalingam",
+  "license": "MIT",
+  "homepage": "https://github.com/Thirumurugan7/Space-please",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Thirumurugan7/Space-please.git"
+  },
   "private": true,
-  "description": "Find everything on your Mac and reclaim storage",
   "main": "out/main/index.js",
   "scripts": {
     "dev": "electron-vite dev",
@@ -11,7 +18,8 @@
     "typecheck": "tsc -p tsconfig.json",
     "test": "vitest run",
     "e2e": "electron-vite build && playwright test",
-    "dist": "electron-vite build && electron-builder --mac --dir"
+    "dist": "electron-vite build && electron-builder --mac",
+    "dist:dir": "electron-vite build && electron-builder --mac --dir"
   },
   "dependencies": {
     "@tanstack/react-virtual": "3.14.12",
@@ -36,8 +44,8 @@
     "vitest": "5.0.0"
   },
   "build": {
-    "appId": "com.gryphin.space-analyser",
-    "productName": "Space Analyser",
+    "appId": "com.thirumurugan7.space-please",
+    "productName": "Space-please",
     "directories": {
       "output": "dist"
     },
@@ -55,16 +63,45 @@
       }
     ],
     "mac": {
-      "target": "dir",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "arm64"
+          ]
+        }
+      ],
       "category": "public.app-category.utilities",
       "identity": null,
       "extendInfo": {
-        "NSDesktopFolderUsageDescription": "Space Analyser reads file sizes on your Desktop to show what uses storage.",
-        "NSDocumentsFolderUsageDescription": "Space Analyser reads file sizes in your Documents folder to show what uses storage.",
-        "NSDownloadsFolderUsageDescription": "Space Analyser reads file sizes in your Downloads folder to show what uses storage.",
-        "NSRemovableVolumesUsageDescription": "Space Analyser reads file sizes on removable volumes to show what uses storage.",
-        "NSNetworkVolumesUsageDescription": "Space Analyser reads file sizes on network volumes to show what uses storage."
-      }
+        "NSDesktopFolderUsageDescription": "Space-please reads file sizes on your Desktop to show what uses storage.",
+        "NSDocumentsFolderUsageDescription": "Space-please reads file sizes in your Documents folder to show what uses storage.",
+        "NSDownloadsFolderUsageDescription": "Space-please reads file sizes in your Downloads folder to show what uses storage.",
+        "NSRemovableVolumesUsageDescription": "Space-please reads file sizes on removable volumes to show what uses storage.",
+        "NSNetworkVolumesUsageDescription": "Space-please reads file sizes on network volumes to show what uses storage."
+      },
+      "icon": "build/icon.png",
+      "minimumSystemVersion": "15.0"
+    },
+    "artifactName": "${productName}.${ext}",
+    "dmg": {
+      "title": "Space-please",
+      "window": {
+        "width": 560,
+        "height": 360
+      },
+      "contents": [
+        {
+          "x": 150,
+          "y": 175
+        },
+        {
+          "x": 410,
+          "y": 175,
+          "type": "link",
+          "path": "/Applications"
+        }
+      ]
     }
   }
 }
